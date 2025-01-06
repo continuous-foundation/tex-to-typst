@@ -19,7 +19,7 @@ export interface IState {
   write(str: string | undefined): void;
   writeChildren(node: LatexNode): void;
   addWhitespace(): void;
-  openFunction(command: string): void;
+  openFunction(command: string, opts?: { openToken?: string; closeToken?: string }): void;
   closeFunction(): void;
   useMacro(macro: string): void;
 }
