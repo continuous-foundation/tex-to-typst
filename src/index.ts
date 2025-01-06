@@ -20,6 +20,12 @@ export function parseLatex(value: string) {
         boldsymbol: { signature: 'm' },
         left: { signature: 'm' },
         right: { signature: 'm' },
+        Big: { signature: 'm' },
+        Bigr: { signature: 'm' },
+        Bigl: { signature: 'm' },
+        big: { signature: 'm' },
+        bigr: { signature: 'm' },
+        bigl: { signature: 'm' },
         dot: { signature: 'm' },
         ddot: { signature: 'm' },
         hat: { signature: 'm' },
@@ -35,6 +41,9 @@ export function parseLatex(value: string) {
         underparen: { signature: 'm' },
         overrightarrow: { signature: 'm' },
         overleftarrow: { signature: 'm' },
+        stackrel: { signature: 'm m' },
+        mathop: { signature: 'm' },
+        // color: { signature: 'm m' }, // This doesn't work, changing it below manually
       },
     })
     .processSync({ value });
@@ -59,6 +68,14 @@ export function walkLatex(node: LatexNode) {
         const { args, nodesRemoved } = gobbleArguments(array.slice(i + 1), 'm');
         next.type = 'macro';
         next.args = args;
+        skip += nodesRemoved;
+      }
+      if (next.type === 'macro' && next.content === 'color') {
+        // Unsure why this is necessary, but the color macro override doesn't seem to work
+        const { args, nodesRemoved } = gobbleArguments(array.slice(i + 1), 'm');
+        next.type = 'macro';
+        // For some reason there is a blank arg at the start
+        next.args = [...(next.args?.slice(1) ?? []), ...args];
         skip += nodesRemoved;
       }
       if (
@@ -113,7 +130,10 @@ class State implements IState {
 
   addWhitespace() {
     const lastChar = this.value.slice(-1);
-    if (!this._value || lastChar.match(/^(["\s_^{(-])$/)) return;
+    if (!this._value) return;
+    if (lastChar.match(/^(["\s_^{(-])$/)) return;
+    const lastTwoChar = this.value.slice(-2);
+    if (!this._value || lastTwoChar === ')[') return; // e.g. `#text(fill: red)[V]
     this._value += ' ';
   }
 
@@ -124,7 +144,7 @@ class State implements IState {
     // This is a bit verbose, but the statements are much easier to read
     if (this._scriptsSimplified && str === '(') {
       this.addWhitespace();
-    } else if (str.match(/^([}()_^,;!])$/)) {
+    } else if (str.match(/^([}()_^.,;!])$/) || str === '\\"') {
       // Ignore!
     } else {
       this.addWhitespace();
@@ -153,7 +173,10 @@ class State implements IState {
     return this._currentFunctions.length;
   }
 
-  openFunction(command: string) {
+  openFunction(
+    command: string,
+    { openToken, closeToken }: { openToken?: string; closeToken?: string } = {},
+  ) {
     if (command === 'text') {
       this.addWhitespace();
     } else {
@@ -163,8 +186,8 @@ class State implements IState {
     this.data.inFunction = true;
     this._simplify = command === '_' || command === '^';
     this._lastFunction = this._value.length;
-    this._value += command === 'text' ? '"' : '(';
-    this._closeToken.push(command === 'text' ? '"' : ')');
+    this._value += openToken ?? (command === 'text' ? '"' : '(');
+    this._closeToken.push(closeToken ?? (command === 'text' ? '"' : ')'));
   }
 
   closeFunction() {

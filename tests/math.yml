@@ -114,6 +114,9 @@ cases:
   - title: mathbb
     tex: '\mathbb{R}'
     typst: RR
+  - title: mathbb no arg
+    tex: '\mathbb R X'
+    typst: RR X
   - title: mathbb all
     tex: '\mathbb{ABCDEFGHIJKLMNOPQRSTUVWXYZ}'
     typst: AA BB CC DD EE FF GG HH II JJ KK LL MM NN OO PP QQ RR SS TT UU VV WW XX YY ZZ
@@ -214,7 +217,74 @@ cases:
     typst: '[ mat(delim: #none, a, b; c, d;) mat(delim: #("|", none), ;;) mat(delim: #none, w, x; y, z;) ]'
   - title: matrix with delim
     tex: \begin{pmatrix}a\\b\\c\\d\\\end{pmatrix}\middle|\begin{Bmatrix}w\\x\\y\\z\\\end{Bmatrix}
-    typst: 'mat(delim: #"(", a; b; c; d;) mat(delim: #("|", none), ;;;;) mat(delim: #"{", w; x; y; z;)'
+    typst: 'mat(delim: "(", a; b; c; d;) mat(delim: #("|", none), ;;;;) mat(delim: "{", w; x; y; z;)'
   - title: blah
     tex: \overrightarrow{p}\  = \begin{bmatrix} p_{Ax} \\p_{Ay} \\p_{Az} \\\end{bmatrix}\sim\lbrack 100\rbrack
-    typst: 'accent(p, arrow) " " = mat(delim: #"[", p_(A x); p_(A y); p_(A z);) tilde [ 100 ]'
+    typst: 'accent(p, arrow) " " = mat(delim: "[", p_(A x); p_(A y); p_(A z);) tilde [ 100 ]'
+  - title: stackrel
+    tex: '\stackrel { d } {\to} N(0, \sigma^2)'
+    typst: 'arrow.r^d N(0, sigma^2)'
+  - title: mathop
+    tex: '\mathop{\text{Var}} S'
+    typst: 'op("Var") S'
+  - title: dollarsigns
+    tex: '\$50,000'
+    typst: '\$ 50, 000'
+  - title: quotes
+    tex: 'V = \{ \text{"ng", "mr", "sr"} \}'
+    typst: 'V = {"\"ng\",\"mr\",\"sr\""}'
+  - title: color
+    tex: '\color{red}{V}'
+    typst: '#text(fill: red)[$ V $]'
+  - title: bmatrix
+    tex: |
+      \begin{bmatrix}
+          a & b \\
+          c & d
+      \end{bmatrix}
+    typst: 'mat(delim: "[", a, b; c, d)'
+  - title: bmatrix with color
+    tex: |
+      \begin{bmatrix}
+          \color{red}{a} & \color{blue}{b} \\
+          \color{blue}{c} & \color{red}{d}
+      \end{bmatrix}
+      =
+      \color{red}{ad} - \color{blue}{bc}.
+    # The `] ;` space is important for some reason!
+    typst: 'mat(delim: "[", #text(fill: red)[$ a $], #text(fill: blue)[$ b $] ; #text(fill: blue)[$ c $], #text(fill: red)[$ d $]) = #text(fill: red)[$ a d $] -#text(fill: blue)[$ b c $].'
+  - title: bmatrix shapes
+    tex: |
+      -2
+      \begin{bmatrix}
+          3 \\
+          -7
+      \end{bmatrix}
+      =
+      \begin{bmatrix}
+          -2 & \times & 3 \\
+          -2 & \times & -7
+      \end{bmatrix}
+      =
+      \begin{bmatrix}
+          -6 \\
+          14
+      \end{bmatrix}.
+    typst: '-2 mat(delim: "[", 3; -7) = mat(delim: "[", -2, times, 3; -2, times, -7) = mat(delim: "[", -6; 14).'
+  - title: bmatrix cr
+    tex: |
+      \begin{bmatrix} p_0 \cr p_1 \cr p_2 \cr \vdots \cr p_{T-1} \cr p_T
+      \end{bmatrix}
+    typst: 'mat(delim: "[", p_0; p_1; p_2; dots.v; p_(T -1); p_T)'
+  - title: Big
+    tex: '\Big|'
+    typst: '#scale(x: 180%, y: 180%)[$ bar.v $]'
+  - title: Big{
+    tex: '\Big\{'
+    typst: '#scale(x: 180%, y: 180%)[$ brace.l $]'
+  - title: big
+    tex: '\big|'
+    typst: '#scale(x: 120%, y: 120%)[$ bar.v $]'
+  - title: Bigl
+    tex: '\Bigl| \frac{\lambda-\alpha(1-\lambda)}{1-\alpha(1-\lambda)} \Bigr| < 1'
+    typst: '#scale(x: 180%, y: 180%)[$ bar.v $] frac(lambda -alpha(1 -lambda), 1 -alpha(1 -lambda)) #scale(x: 180%, y: 180%)[$ bar.v $] < 1'

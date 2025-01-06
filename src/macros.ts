@@ -6,12 +6,37 @@ function isEmptyNode(node?: LatexNode): boolean {
 }
 
 export const typstStrings: Record<string, string | ((state: IState) => string)> = {
-  ',': (state) => (state.data.inFunction ? 'comma' : ','),
+  ',': (state) =>
+    state.data.inFunction && (state as any)._currentFunctions.slice(-1)[0] !== 'text'
+      ? 'comma'
+      : ',',
   '&': (state) => (state.data.inArray ? ',' : '&'),
   '/': '\\/',
   ';': '\\;',
   '~': 'med',
+  '"': '\\"',
 };
+
+const brackets: Record<string, string> = {
+  '[': 'bracket.l',
+  ']': 'bracket.r',
+  '{': 'brace.l',
+  '}': 'brace.r',
+  '(': 'paren.l',
+  ')': 'paren.r',
+  '|': 'bar.v',
+};
+
+function createBrackets(scale: string): (state: IState, node: LatexNode) => string {
+  return (state: IState, node: LatexNode) => {
+    const args = node.args;
+    node.args = [];
+    const b = (args?.[0].content?.[0] as LatexNode).content as string;
+    const typstB = brackets[b];
+    if (!typstB) throw new Error(`Undefined left bracket: ${b}`);
+    return `#scale(x: ${scale}, y: ${scale})[$ ${typstB} $]`;
+  };
+}
 
 function splitStrings(node: LatexNode) {
   if (
@@ -25,6 +50,7 @@ function splitStrings(node: LatexNode) {
 }
 
 export const typstMacros: Record<string, string | ((state: IState, node: LatexNode) => string)> = {
+  $: '\\$',
   cdot: 'dot.op',
   to: 'arrow.r',
   rightarrow: 'arrow.r',
@@ -64,6 +90,12 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
     splitStrings(node);
     return '^';
   },
+  bigl: createBrackets('120%'),
+  bigr: createBrackets('120%'),
+  big: createBrackets('120%'),
+  Bigl: createBrackets('180%'),
+  Bigr: createBrackets('180%'),
+  Big: createBrackets('180%'),
   left: (state, node) => {
     const args = node.args;
     node.args = [];
@@ -95,10 +127,21 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
     node.args = [{ type: 'macro', content: 'text', args: [text] }];
     return 'op';
   },
+  mathop: 'op',
   '\\': (state, node) => {
     node.args = [];
     if (state.data.inArray) {
       state.data.previousMatRows = (state.data.previousMatRows ?? 0) + 1;
+      if ((state as any)._value.slice(-1) === ']') state.addWhitespace();
+      return ';';
+    }
+    return '\\\n';
+  },
+  cr: (state, node) => {
+    node.args = [];
+    if (state.data.inArray) {
+      state.data.previousMatRows = (state.data.previousMatRows ?? 0) + 1;
+      if ((state as any)._value.slice(-1) === ']') state.addWhitespace();
       return ';';
     }
     return '\\\n';
@@ -114,17 +157,20 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   doteq: 'dot(eq)',
   ge: 'gt.eq',
   geq: 'gt.eq',
+  gg: 'gt.double',
   le: 'lt.eq',
   leq: 'lt.eq',
+  ll: 'lt.double',
   neq: 'eq.not',
   otimes: 'times.circle',
+  circ: 'compose',
+  vert: 'bar.v',
   dot: 'dot',
   ddot: 'dot.double',
   dots: 'dots.h',
   ldots: 'dots.h',
   vdots: 'dots.v',
   ddots: 'dots.down',
-  circ: 'circle.small',
   subseteq: 'subset.eq',
   cdots: 'dots.h.c',
   cap: 'sect',
@@ -138,6 +184,9 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   quad: 'quad',
   qquad: 'wide',
   prod: 'product',
+  lfloor: 'floor.l',
+  rfloor: 'floor.r',
+  implies: 'arrow.r.double.long',
   biggl: '',
   biggr: '',
   ' ': '" "',
@@ -177,13 +226,30 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   middle: (state) => {
     return `mat(delim: #("|", none), ${';'.repeat(state.data.previousMatRows ?? 1)})`;
   },
+  stackrel: (state, node) => {
+    const args = node.args?.reverse();
+    node.args = [];
+    state.writeChildren(args?.[0] as LatexNode);
+    state.write('^');
+    state.writeChildren(args?.[1] as LatexNode);
+    return '';
+  },
+  color: (state, node) => {
+    const [fill, children] = node.args ?? [];
+    const color = (fill.content?.[0] as LatexNode)?.content as string;
+    node.args = [];
+    state.openFunction(`#text(fill: ${color})`, { openToken: '[$ ', closeToken: ' $]' });
+    state.writeChildren(children as LatexNode);
+    state.closeFunction();
+    return '';
+  },
 };
 
 const matrixEnv = (delim?: string) => (state: IState, node: LatexNode) => {
   state.data.inArray = true;
   state.data.previousMatRows = 0;
   state.openFunction('mat');
-  state.write(`delim: #${delim ? `"${delim}"` : 'none'},`);
+  state.write(`delim: ${delim ? `"${delim}"` : '#none'},`);
   state.writeChildren(node);
   state.closeFunction();
   state.data.inArray = false;
