@@ -344,3 +344,9 @@ cases:
       \mathbf{u} \wedge \mathbf{v} \equiv
       \mathbf{u} \otimes \mathbf{v} - \mathbf{v} \otimes \mathbf{u}\,.
     typst: 'bold(u) and bold(v) equiv bold(u) times.circle bold(v) -bold(v) times.circle bold(u) thin.'
+  - title: frac
+    tex: '\vec{e}_i = \frac{\partial\mathbf{r}}{\partial x^i} \equiv \frac{\partial}{\partial x^i}\,,'
+    typst: 'arrow(e)_i = frac(diff bold(r), diff x^i) equiv frac(diff, diff x^i) thin,'
+  - title: over
+    tex: '\vec{e}_i = {\partial\mathbf{r}\over\partial x^i} \equiv {\partial\over\partial x^i}\,,'
+    typst: 'arrow(e)_i = frac(diff bold(r), diff x^i) equiv frac(diff, diff x^i) thin,'
