@@ -187,6 +187,7 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   '!': '#h(-1em)',
   quad: 'quad',
   qquad: 'wide',
+  wedge: 'and',
   prod: 'product',
   lfloor: 'floor.l',
   rfloor: 'floor.r',
