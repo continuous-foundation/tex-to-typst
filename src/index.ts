@@ -118,6 +118,20 @@ export function walkLatex(node: LatexNode) {
       if (next.type === 'macro' && next.content === 'middle' && array[i + 1]?.content === '|') {
         skip += 1;
       }
+      if (
+        next.type === 'group' &&
+        (next.content as LatexNode[])?.find?.((n) => n.type === 'macro' && n.content === 'over')
+      ) {
+        // Change {a \over b} to \frac{a}{b}
+        const children = next.content as LatexNode[];
+        next.type = 'macro';
+        next.content = 'frac';
+        const index = children.findIndex((n) => n.type === 'macro' && n.content === 'over');
+        next.args = [
+          { type: 'argument', content: children.slice(0, index) },
+          { type: 'argument', content: children.slice(index + 1) },
+        ];
+      }
       list.push(next);
       return list;
     }, [] as LatexNode[]);
