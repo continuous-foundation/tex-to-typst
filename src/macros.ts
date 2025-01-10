@@ -34,7 +34,7 @@ function createBrackets(scale: string): (state: IState, node: LatexNode) => stri
     const b = (args?.[0].content?.[0] as LatexNode).content as string;
     const typstB = brackets[b];
     if (!typstB) throw new Error(`Undefined left bracket: ${b}`);
-    return `#scale(x: ${scale}, y: ${scale})[$ ${typstB} $]`;
+    return `#scale(x: ${scale}, y: ${scale})[$${typstB}$]`;
   };
 }
 
@@ -73,8 +73,11 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
     return 'root';
   },
   vec: 'arrow',
+  check: 'caron',
+  bar: 'macron',
   mathbf: 'bold',
   boldsymbol: 'bold',
+  bf: 'bold',
   mathrm: 'upright',
   textrm: 'upright',
   rm: 'upright',
@@ -176,6 +179,7 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   cap: 'sect',
   cup: 'union',
   widehat: 'hat',
+  widetilde: 'tilde',
   // Spaces
   ',': 'thin',
   ':': 'med',
@@ -238,7 +242,7 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
     const [fill, children] = node.args ?? [];
     const color = (fill.content?.[0] as LatexNode)?.content as string;
     node.args = [];
-    state.openFunction(`#text(fill: ${color})`, { openToken: '[$ ', closeToken: ' $]' });
+    state.openFunction(`#text(fill: ${color})`, { openToken: '[$', closeToken: '$]' });
     state.writeChildren(children as LatexNode);
     state.closeFunction();
     return '';
@@ -262,4 +266,10 @@ export const typstEnvs: Record<string, (state: IState, node: LatexNode) => void>
   bmatrix: matrixEnv('['),
   Bmatrix: matrixEnv('{'),
   vmatrix: matrixEnv('|'),
+  aligned(state, node) {
+    state.writeChildren(node);
+  },
+  ['aligned*'](state, node) {
+    state.writeChildren(node);
+  },
 };
