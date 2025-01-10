@@ -2,20 +2,20 @@ title: tex-to-typst
 cases:
   - title: Integrals and vec
     tex: '\nabla \cdot \vec{j}(p) = \lim_{v \to \{ p \}} = \int \int_{S(v)} \frac{\vec{j} \cdot \vec{n}}{v} dS'
-    typst: nabla dot.op arrow(j)(p) = lim_(v arrow.r {p}) = integral integral_(S(v)) frac(arrow(j) dot.op arrow(n), v) d S
+    typst: nabla dot.op arrow(j) (p) = lim_(v arrow.r {p}) = integral integral_(S (v)) frac(arrow(j) dot.op arrow(n), v) d S
   - title: Fractions and vectors
     tex: '\frac{1}{4} \sum_{i=1}^4 \mathbf{P}_i^\top \sqrt{v} \mathbf{\Sigma}^{-1} \sqrt{v} \mathbf{P}_i \mathbf{j} = \mathbf{D}^\top v \phi'
     typst: frac(1, 4) sum_(i = 1)^4 bold(P)_i^top sqrt(v) bold(Sigma)^(-1) sqrt(v) bold(P)_i bold(j) = bold(D)^top v phi.alt
   - title: Testing factorial, no space
     tex: 'p ( x )   =    \frac{e^{-\lambda}\lambda^{x}}{ x ! }'
-    typst: p(x) = frac(e^(-lambda) lambda^x, x!)
+    typst: p (x) = frac(e^(-lambda) lambda^x, x!)
   - title: Mathrm
     tex: 'p_e = 1-\mathrm{e}^{-t \lambda}'
     typst: p_e = 1 -upright(e)^(-t lambda)
   - title: Mathrm multiple
     note: The text comes in as an argument but in one string, which needs to be treated differently
     tex: 'f(x_t, \mathrm{left})'
-    typst: f(x_t, upright(l e f t))
+    typst: f (x_t, upright(l e f t))
   - title: Cube root
     tex: '\sqrt[3]{x}'
     typst: root(3, x)
@@ -25,7 +25,7 @@ cases:
   - title: Simplified brackets f(x)
     note: This doesn't actually need the extra brackets, but it is clearer!
     tex: 'e_{f(x)}'
-    typst: e_(f(x))
+    typst: e_(f (x))
   - title: Text Functions
     tex: '\text{diag}({\mathbf{v}}) \mathbf{D}\mathbf{M}_f(\sigma^{-1})^{-1}\mathbf{D}^\top\text{diag}({\mathbf{v}})\phi = \mathbf{q}'
     typst: '"diag"(bold(v)) bold(D) bold(M)_f (sigma^(-1))^(-1) bold(D)^top "diag"(bold(v)) phi.alt = bold(q)'
@@ -97,8 +97,8 @@ cases:
       }_{\mathbf{B}(\psi^{n+1})}&
       \end{align*}
     typst: |-
-      overbrace([ frac(1, Delta t) frac(diff bold(theta)^(n + 1), diff bold(psi)^(n + 1)) -bold(D) "diag"(bold(G) bold(psi)^(n + 1)) frac(diff bold(k)_(A v), diff bold(psi)^(n + 1)) -bold(D) "diag"(bold(k)_(A v)(bold(psi)^(n + 1) comma bold(m))) bold(G) -bold(G)_z frac(diff bold(k)_(A v), diff bold(psi)^(n + 1)) ], bold(A)_0(bold(psi)^(n + 1))) frac(diff bold(psi)^(n + 1), diff bold(m)) \
-      + underbrace([ -frac(1, Delta t) frac(diff bold(theta)^n, diff bold(psi)^n) ], bold(A)_(-1)(bold(psi)^n)) frac(diff bold(psi)^n, diff bold(m)) = underbrace([ -bold(D) "diag"(bold(G) bold(psi)^(n + 1)) frac(diff bold(k)_(A v), diff bold(m)) -bold(G)_z frac(diff bold(k)_(A v), diff bold(m)) ], bold(B)(psi^(n + 1))) &
+      overbrace([ frac(1, Delta t) frac(diff bold(theta)^(n + 1), diff bold(psi)^(n + 1)) -bold(D) "diag"(bold(G) bold(psi)^(n + 1)) frac(diff bold(k)_(A v), diff bold(psi)^(n + 1)) -bold(D) "diag"(bold(k)_(A v) (bold(psi)^(n + 1) comma bold(m))) bold(G) -bold(G)_z frac(diff bold(k)_(A v), diff bold(psi)^(n + 1)) ], bold(A)_0 (bold(psi)^(n + 1))) frac(diff bold(psi)^(n + 1), diff bold(m)) \
+      + underbrace([ -frac(1, Delta t) frac(diff bold(theta)^n, diff bold(psi)^n) ], bold(A)_(-1) (bold(psi)^n)) frac(diff bold(psi)^n, diff bold(m)) = underbrace([ -bold(D) "diag"(bold(G) bold(psi)^(n + 1)) frac(diff bold(k)_(A v), diff bold(m)) -bold(G)_z frac(diff bold(k)_(A v), diff bold(m)) ], bold(B) (psi^(n + 1))) &
   - title: underbraces inside of a function
     description: For some reason the "_" here is treated as text, not a macro.
     tex: |
@@ -138,10 +138,10 @@ cases:
     typst: 'dot(x)^2'
   - title: mat
     tex: 'x(t) = \left[ \begin{array}{c} q(t) & x \\ \dot{q}(t) & x \end{array}\right]'
-    typst: 'x(t) = [ mat(delim: #none, q(t), x; dot(q)(t), x) ]'
+    typst: 'x (t) = [ mat(delim: #none, q (t), x; dot(q) (t), x) ]'
   - title: brackets
     tex: '\frac{1}{\tau(X_2)}'
-    typst: 'frac(1, tau(X_2))'
+    typst: 'frac(1, tau (X_2))'
   - title: bar and nested bb
     skip: true
     tex: '\mathbb{\bar{R}}'
@@ -236,7 +236,7 @@ cases:
     typst: 'accent(p, arrow) " " = mat(delim: "[", p_(A x); p_(A y); p_(A z);) tilde [ 100 ]'
   - title: stackrel
     tex: '\stackrel { d } {\to} N(0, \sigma^2)'
-    typst: 'arrow.r^d N(0, sigma^2)'
+    typst: 'arrow.r^d N (0, sigma^2)'
   - title: mathop
     tex: '\mathop{\text{Var}} S'
     typst: 'op("Var") S'
@@ -300,7 +300,7 @@ cases:
     typst: '#scale(x: 120%, y: 120%)[$bar.v$]'
   - title: Bigl
     tex: '\Bigl| \frac{\lambda-\alpha(1-\lambda)}{1-\alpha(1-\lambda)} \Bigr| < 1'
-    typst: '#scale(x: 180%, y: 180%)[$bar.v$] frac(lambda -alpha(1 -lambda), 1 -alpha(1 -lambda)) #scale(x: 180%, y: 180%)[$bar.v$] < 1'
+    typst: '#scale(x: 180%, y: 180%)[$bar.v$] frac(lambda -alpha (1 -lambda), 1 -alpha (1 -lambda)) #scale(x: 180%, y: 180%)[$bar.v$] < 1'
   - title: big no space
     tex: '\theta = \tan^{-1} \Big( \frac{y}{x} \Big)'
     typst: 'theta = tan^(-1) #scale(x: 180%, y: 180%)[$paren.l$] frac(y, x) #scale(x: 180%, y: 180%)[$paren.r$]'
@@ -350,3 +350,7 @@ cases:
   - title: over
     tex: '\vec{e}_i = {\partial\mathbf{r}\over\partial x^i} \equiv {\partial\over\partial x^i}\,,'
     typst: 'arrow(e)_i = frac(diff bold(r), diff x^i) equiv frac(diff, diff x^i) thin,'
+  - title: cdot
+    description: The space in `dot.op()` vs `dot.op ()` is important!!
+    tex: '(dx^1 \wedge dx^2 \wedge dx^4) \cdot (\mathbf{u} \otimes \mathbf{v} \otimes \mathbf{w})='
+    typst: '(d x^1 and d x^2 and d x^4) dot.op (bold(u) times.circle bold(v) times.circle bold(w)) ='
