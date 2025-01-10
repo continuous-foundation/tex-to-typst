@@ -339,3 +339,8 @@ cases:
       35 p_0 -5 p_1 -5 p_2 = 100 \
       -5 p_0 + 25 p_1 -10 p_2 = 75 \
       -5 p_0 -5 p_1 + 15 p_2 = 55
+  - title: wedge
+    tex: |
+      \mathbf{u} \wedge \mathbf{v} \equiv
+      \mathbf{u} \otimes \mathbf{v} - \mathbf{v} \otimes \mathbf{u}\,.
+    typst: 'bold(u) and bold(v) equiv bold(u) times.circle bold(v) -bold(v) times.circle bold(u) thin.'
