@@ -180,7 +180,7 @@ class State implements IState {
     // This is a bit verbose, but the statements are much easier to read
     if (this._scriptsSimplified && str === '(') {
       this.addWhitespace();
-    } else if (str.match(/^([}()_^.,;!])$/) || str === '\\"') {
+    } else if (str.match(/^([})_^.,;!])$/) || str === '\\"') {
       // Ignore!
     } else {
       this.addWhitespace();
