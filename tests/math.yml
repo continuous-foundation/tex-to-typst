@@ -99,6 +99,16 @@ cases:
     typst: |-
       overbrace([ frac(1, Delta t) frac(diff bold(theta)^(n + 1), diff bold(psi)^(n + 1)) -bold(D) "diag"(bold(G) bold(psi)^(n + 1)) frac(diff bold(k)_(A v), diff bold(psi)^(n + 1)) -bold(D) "diag"(bold(k)_(A v)(bold(psi)^(n + 1) comma bold(m))) bold(G) -bold(G)_z frac(diff bold(k)_(A v), diff bold(psi)^(n + 1)) ], bold(A)_0(bold(psi)^(n + 1))) frac(diff bold(psi)^(n + 1), diff bold(m)) \
       + underbrace([ -frac(1, Delta t) frac(diff bold(theta)^n, diff bold(psi)^n) ], bold(A)_(-1)(bold(psi)^n)) frac(diff bold(psi)^n, diff bold(m)) = underbrace([ -bold(D) "diag"(bold(G) bold(psi)^(n + 1)) frac(diff bold(k)_(A v), diff bold(m)) -bold(G)_z frac(diff bold(k)_(A v), diff bold(m)) ], bold(B)(psi^(n + 1))) &
+  - title: underbraces inside of a function
+    description: For some reason the "_" here is treated as text, not a macro.
+    tex: |
+      \color{red}{\underbrace{
+      \color{black}{\begin{bmatrix}
+        0 & 1 \\
+      -1 & 0
+      \end{bmatrix}}
+      }_{\textstyle A} }
+    typst: '#text(fill: red)[$underbrace(#text(fill: black)[$mat(delim: "[", 0, 1; -1, 0)$], "A")$]'
   - title: leading underscore
     tex: _2
     typst: '""_2'
@@ -123,6 +133,9 @@ cases:
   - title: ddot
     tex: 'q, \dot{q}, \ddot{q}'
     typst: q, dot(q), dot.double(q)
+  - title: dot
+    tex: '\dot x^2'
+    typst: 'dot(x)^2'
   - title: mat
     tex: 'x(t) = \left[ \begin{array}{c} q(t) & x \\ \dot{q}(t) & x \end{array}\right]'
     typst: 'x(t) = [ mat(delim: #none, q(t), x; dot(q)(t), x) ]'
@@ -235,7 +248,7 @@ cases:
     typst: 'V = {"\"ng\",\"mr\",\"sr\""}'
   - title: color
     tex: '\color{red}{V}'
-    typst: '#text(fill: red)[$ V $]'
+    typst: '#text(fill: red)[$V$]'
   - title: bmatrix
     tex: |
       \begin{bmatrix}
@@ -252,7 +265,7 @@ cases:
       =
       \color{red}{ad} - \color{blue}{bc}.
     # The `] ;` space is important for some reason!
-    typst: 'mat(delim: "[", #text(fill: red)[$ a $], #text(fill: blue)[$ b $] ; #text(fill: blue)[$ c $], #text(fill: red)[$ d $]) = #text(fill: red)[$ a d $] -#text(fill: blue)[$ b c $].'
+    typst: 'mat(delim: "[", #text(fill: red)[$a$], #text(fill: blue)[$b$] ; #text(fill: blue)[$c$], #text(fill: red)[$d$]) = #text(fill: red)[$a d$] -#text(fill: blue)[$b c$].'
   - title: bmatrix shapes
     tex: |
       -2
@@ -278,13 +291,51 @@ cases:
     typst: 'mat(delim: "[", p_0; p_1; p_2; dots.v; p_(T -1); p_T)'
   - title: Big
     tex: '\Big|'
-    typst: '#scale(x: 180%, y: 180%)[$ bar.v $]'
+    typst: '#scale(x: 180%, y: 180%)[$bar.v$]'
   - title: Big{
     tex: '\Big\{'
-    typst: '#scale(x: 180%, y: 180%)[$ brace.l $]'
+    typst: '#scale(x: 180%, y: 180%)[$brace.l$]'
   - title: big
     tex: '\big|'
-    typst: '#scale(x: 120%, y: 120%)[$ bar.v $]'
+    typst: '#scale(x: 120%, y: 120%)[$bar.v$]'
   - title: Bigl
     tex: '\Bigl| \frac{\lambda-\alpha(1-\lambda)}{1-\alpha(1-\lambda)} \Bigr| < 1'
-    typst: '#scale(x: 180%, y: 180%)[$ bar.v $] frac(lambda -alpha(1 -lambda), 1 -alpha(1 -lambda)) #scale(x: 180%, y: 180%)[$ bar.v $] < 1'
+    typst: '#scale(x: 180%, y: 180%)[$bar.v$] frac(lambda -alpha(1 -lambda), 1 -alpha(1 -lambda)) #scale(x: 180%, y: 180%)[$bar.v$] < 1'
+  - title: big no space
+    tex: '\theta = \tan^{-1} \Big( \frac{y}{x} \Big)'
+    typst: 'theta = tan^(-1) #scale(x: 180%, y: 180%)[$paren.l$] frac(y, x) #scale(x: 180%, y: 180%)[$paren.r$]'
+  - title: hat group
+    tex: '{\hat x}'
+    typst: 'hat(x)'
+  - title: hat function
+    tex: '\hat{x}'
+    typst: 'hat(x)'
+  - title: check
+    tex: '\check p_{-1}, \check \pi_{-1}^*'
+    typst: 'caron(p)_(-1), caron(pi)_(-1)^(*)'
+  - title: bar
+    tex: '\bar x'
+    typst: 'macron(x)'
+  - title: hat
+    tex: '\hat x'
+    typst: 'hat(x)'
+  - title: accents
+    tex: 'B_{-1}- \check B_{-1}  = \frac{\widetilde R}{p_0} \left( \check m_0 - m_0 \right)'
+    typst: 'B_(-1) -caron(B)_(-1) = frac(tilde(R), p_0) (caron(m)_0 -m_0)'
+  - title: bf
+    tex: '{\bf R}^2'
+    typst: 'bold(R)^2'
+  - title: bf
+    tex: '{\bf R}^2'
+    typst: 'bold(R)^2'
+  - title: aligned
+    tex: |
+      \begin{aligned}
+        35p_0 - 5p_1 - 5p_2 = 100 \\
+        -5p_0 + 25p_1 - 10p_2 = 75 \\
+        -5p_0 - 5p_1 + 15p_2 = 55
+      \end{aligned}
+    typst: |-
+      35 p_0 -5 p_1 -5 p_2 = 100 \
+      -5 p_0 + 25 p_1 -10 p_2 = 75 \
+      -5 p_0 -5 p_1 + 15 p_2 = 55

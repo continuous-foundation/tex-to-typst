@@ -30,7 +30,10 @@ export function parseLatex(value: string) {
         ddot: { signature: 'm' },
         hat: { signature: 'm' },
         tilde: { signature: 'm' },
+        check: { signature: 'm' },
+        bar: { signature: 'm' },
         widehat: { signature: 'm' },
+        widetilde: { signature: 'm' },
         overset: { signature: 'm m' },
         underset: { signature: 'm m' },
         overbrace: { signature: 'm' },
@@ -43,6 +46,8 @@ export function parseLatex(value: string) {
         overleftarrow: { signature: 'm' },
         stackrel: { signature: 'm m' },
         mathop: { signature: 'm' },
+        bf: { signature: 'm' },
+        textstyle: { signature: 'm' },
         // color: { signature: 'm m' }, // This doesn't work, changing it below manually
       },
     })
@@ -78,6 +83,9 @@ export function walkLatex(node: LatexNode) {
         next.args = [...(next.args?.slice(1) ?? []), ...args];
         skip += nodesRemoved;
       }
+      if (next.type === 'macro' && next.content === 'textstyle') {
+        next.content = 'text';
+      }
       if (
         next.type === 'macro' &&
         (next.content === 'overbrace' || next.content === 'underbrace')
@@ -91,6 +99,20 @@ export function walkLatex(node: LatexNode) {
         ) {
           next.args = [...(next.args ?? []), ...args[0].content[0].args];
           skip += nodesRemoved;
+        }
+        if (
+          args[0].content.length === 1 &&
+          args[0].content[0].type === 'string' &&
+          ((args[0].content[0].content === '^' && next.content === 'overbrace') ||
+            (args[0].content[0].content === '_' && next.content === 'underbrace'))
+        ) {
+          // need to get another argument, the _/^ was treated as a string, not an arg
+          const { args: doubleArgs, nodesRemoved: doubleNodesRemoved } = gobbleArguments(
+            array.slice(i + 1),
+            'm m',
+          );
+          next.args = [...(next.args ?? []), doubleArgs[1]];
+          skip += doubleNodesRemoved;
         }
       }
       if (next.type === 'macro' && next.content === 'middle' && array[i + 1]?.content === '|') {
@@ -133,7 +155,7 @@ class State implements IState {
     if (!this._value) return;
     if (lastChar.match(/^(["\s_^{(-])$/)) return;
     const lastTwoChar = this.value.slice(-2);
-    if (!this._value || lastTwoChar === ')[') return; // e.g. `#text(fill: red)[V]
+    if (!this._value || lastTwoChar === ')[' || lastTwoChar === '[$') return; // e.g. `#text(fill: red)[V]
     this._value += ' ';
   }
 
