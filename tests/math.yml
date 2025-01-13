@@ -180,6 +180,19 @@ cases:
   - title: no break space
     tex: '27~\mathrm{km}'
     typst: '27 med upright(k m)'
+  - title: mbox
+    tex: |
+      \begin{aligned}
+      \max_{x_1,x_2} & z = 3 x_1 + 4 x_2 \\
+      \mbox{subject to} & 2 x_1 + 5 x_2 \le 30 \\
+      & 4 x_1 + 2 x_2 \le 20 \\
+      & x_1, x_2 \ge 0
+      \end{aligned}
+    typst: |-
+      max_(x_1 comma x_2) & z = 3 x_1 + 4 x_2 \
+      upright("subject to") & 2 x_1 + 5 x_2 lt.eq 30 \
+      & 4 x_1 + 2 x_2 lt.eq 20 \
+      & x_1, x_2 gt.eq 0
   - title: mathsrc
     tex: '\mathcal{F} \ne \mathscr{C}'
     typst: 'cal(F) != scr(C)'
