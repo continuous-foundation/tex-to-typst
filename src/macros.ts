@@ -81,6 +81,16 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   mathrm: 'upright',
   textrm: 'upright',
   rm: 'upright',
+  mbox: (state, node) => {
+    const arg = node.args?.[0] as LatexNode;
+    node.args = [];
+    state.openFunction('upright');
+    state.openFunction('text');
+    state.writeChildren(arg);
+    state.closeFunction();
+    state.closeFunction();
+    return '';
+  },
   mathcal: 'cal',
   mathfrak: 'frak',
   pm: 'plus.minus',
