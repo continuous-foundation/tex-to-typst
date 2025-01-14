@@ -198,6 +198,8 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   prod: 'product',
   lfloor: 'floor.l',
   rfloor: 'floor.r',
+  langle: 'angle.l',
+  rangle: 'angle.r',
   implies: 'arrow.r.double.long',
   ' ': '" "',
   mathbb: (state, node) => {
