@@ -314,6 +314,12 @@ cases:
   - title: Bigl
     tex: '\Bigl| \frac{\lambda-\alpha(1-\lambda)}{1-\alpha(1-\lambda)} \Bigr| < 1'
     typst: '#scale(x: 180%, y: 180%)[$bar.v$] frac(lambda -alpha (1 -lambda), 1 -alpha (1 -lambda)) #scale(x: 180%, y: 180%)[$bar.v$] < 1'
+  - title: bigg
+    tex: '\frac{1}{4i} \bigg( \frac{-i}{2} e^{2i\omega} - \frac{i}{2} e^{-2i\omega} + C_1 \bigg)'
+    typst: 'frac(1, 4 i) #scale(x: 240%, y: 240%)[$paren.l$] frac(-i, 2) e^(2 i omega) -frac(i, 2) e^(-2 i omega) + C_1 #scale(x: 240%, y: 240%)[$paren.r$]'
+  - title: bigr floor
+    tex: '\bigr \rfloor'
+    typst: '#scale(x: 120%, y: 120%)[$floor.r$]'
   - title: big no space
     tex: '\theta = \tan^{-1} \Big( \frac{y}{x} \Big)'
     typst: 'theta = tan^(-1) #scale(x: 180%, y: 180%)[$paren.l$] frac(y, x) #scale(x: 180%, y: 180%)[$paren.r$]'
@@ -367,3 +373,6 @@ cases:
     description: The space in `dot.op()` vs `dot.op ()` is important!!
     tex: '(dx^1 \wedge dx^2 \wedge dx^4) \cdot (\mathbf{u} \otimes \mathbf{v} \otimes \mathbf{w})='
     typst: '(d x^1 and d x^2 and d x^4) dot.op (bold(u) times.circle bold(v) times.circle bold(w)) ='
+  - title: complex brackets
+    tex: '\partial_{[i} f_{j]}'
+    typst: 'diff_(bracket.l i) f_(j bracket.r)'

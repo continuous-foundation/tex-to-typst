@@ -9,6 +9,7 @@ import {
 } from '@unified-latex/unified-latex-util-arguments';
 import { typstEnvs, typstMacros, typstStrings } from './macros.js';
 import type { IState, LatexNode, StateData } from './types.js';
+import { areBracketsBalanced, BRACKETS } from './utils.js';
 
 export function parseLatex(value: string) {
   const file = unified()
@@ -20,12 +21,18 @@ export function parseLatex(value: string) {
         boldsymbol: { signature: 'm' },
         left: { signature: 'm' },
         right: { signature: 'm' },
-        Big: { signature: 'm' },
-        Bigr: { signature: 'm' },
-        Bigl: { signature: 'm' },
         big: { signature: 'm' },
         bigr: { signature: 'm' },
         bigl: { signature: 'm' },
+        Big: { signature: 'm' },
+        Bigr: { signature: 'm' },
+        Bigl: { signature: 'm' },
+        bigg: { signature: 'm' },
+        biggr: { signature: 'm' },
+        biggl: { signature: 'm' },
+        Bigg: { signature: 'm' },
+        Biggr: { signature: 'm' },
+        Biggl: { signature: 'm' },
         dot: { signature: 'm' },
         ddot: { signature: 'm' },
         hat: { signature: 'm' },
@@ -150,9 +157,9 @@ class State implements IState {
   _value: string;
   data: StateData;
 
-  constructor() {
+  constructor(opts?: { writeOutBrackets?: boolean }) {
     this._value = '';
-    this.data = {};
+    this.data = { writeOutBrackets: opts?.writeOutBrackets ?? false };
   }
 
   get value() {
@@ -177,6 +184,11 @@ class State implements IState {
 
   write(str?: string) {
     if (!str) return;
+    if (Object.keys(BRACKETS).includes(str) && this.data.inFunction && this.data.writeOutBrackets) {
+      this.addWhitespace();
+      this._value += BRACKETS[str];
+      return;
+    }
     // This is a bit verbose, but the statements are much easier to read
     if (this._scriptsSimplified && str === '(') {
       this.addWhitespace();
@@ -313,9 +325,18 @@ function postProcess(typst: string) {
   );
 }
 
-export function texToTypst(value: string): { value: string; macros?: Set<string> } {
+export function texToTypst(
+  value: string,
+  options?: { writeOutBrackets?: boolean },
+): { value: string; macros?: Set<string> } {
   const tree = parseLatex(value);
   walkLatex(tree);
-  const state = writeTypst(tree);
-  return { value: postProcess(state.value), macros: state.data.macros };
+  const state = writeTypst(tree, new State({ writeOutBrackets: options?.writeOutBrackets }));
+  const typstValue = postProcess(state.value);
+  if (options?.writeOutBrackets || areBracketsBalanced(typstValue)) {
+    return { value: typstValue, macros: state.data.macros };
+  }
+  // This could be improved to a single pass if we have an intermediate AST for writing typst
+  // However, we are just writing this out twice at the moment if we find unbalanced brackets.
+  return texToTypst(value, { writeOutBrackets: true });
 }

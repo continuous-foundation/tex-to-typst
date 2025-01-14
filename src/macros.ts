@@ -1,4 +1,5 @@
 import type { IState, LatexNode } from './types.js';
+import { BRACKETS } from './utils.js';
 
 function isEmptyNode(node?: LatexNode): boolean {
   if (!node?.content || node.content.length === 0) return true;
@@ -17,22 +18,12 @@ export const typstStrings: Record<string, string | ((state: IState) => string)> 
   '"': '\\"',
 };
 
-const brackets: Record<string, string> = {
-  '[': 'bracket.l',
-  ']': 'bracket.r',
-  '{': 'brace.l',
-  '}': 'brace.r',
-  '(': 'paren.l',
-  ')': 'paren.r',
-  '|': 'bar.v',
-};
-
 function createBrackets(scale: string): (state: IState, node: LatexNode) => string {
   return (state: IState, node: LatexNode) => {
     const args = node.args;
     node.args = [];
     const b = (args?.[0].content?.[0] as LatexNode).content as string;
-    const typstB = brackets[b];
+    const typstB = BRACKETS[b];
     if (!typstB) throw new Error(`Undefined left bracket: ${b}`);
     return `#scale(x: ${scale}, y: ${scale})[$${typstB}$]`;
   };
@@ -103,12 +94,18 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
     splitStrings(node);
     return '^';
   },
+  big: createBrackets('120%'),
   bigl: createBrackets('120%'),
   bigr: createBrackets('120%'),
-  big: createBrackets('120%'),
+  Big: createBrackets('180%'),
   Bigl: createBrackets('180%'),
   Bigr: createBrackets('180%'),
-  Big: createBrackets('180%'),
+  bigg: createBrackets('240%'),
+  biggr: createBrackets('240%'),
+  biggl: createBrackets('240%'),
+  Bigg: createBrackets('300%'),
+  Biggl: createBrackets('300%'),
+  Biggr: createBrackets('300%'),
   left: (state, node) => {
     const args = node.args;
     node.args = [];
@@ -202,8 +199,6 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   lfloor: 'floor.l',
   rfloor: 'floor.r',
   implies: 'arrow.r.double.long',
-  biggl: '',
-  biggr: '',
   ' ': '" "',
   mathbb: (state, node) => {
     const text =
