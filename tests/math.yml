@@ -376,3 +376,6 @@ cases:
   - title: complex brackets
     tex: '\partial_{[i} f_{j]}'
     typst: 'diff_(bracket.l i) f_(j bracket.r)'
+  - title: angle
+    tex: '\langle A \rangle'
+    typst: 'angle.l A angle.r'
