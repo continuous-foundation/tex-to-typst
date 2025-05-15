@@ -52,8 +52,10 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   gets: 'arrow.l',
   rightharpoonup: 'harpoon.rt',
   rightharpoondown: 'harpoon.rb',
+  rightleftharpoons: 'harpoons.rtlb',
   leftharpoonup: 'harpoon.lt',
   leftharpoondown: 'harpoon.lb',
+  leftrightharpoons: 'harpoons.ltrb',
   infin: 'infinity', // This is a mathjax only thing, https://docs.mathjax.org/en/v2.7-latest/tex.html#i
   infty: 'infinity', // oo
   nonumber: '',
