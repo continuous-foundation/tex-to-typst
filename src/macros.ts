@@ -42,6 +42,8 @@ function splitStrings(node: LatexNode) {
 
 export const typstMacros: Record<string, string | ((state: IState, node: LatexNode) => string)> = {
   $: '\\$',
+  dfrac: 'frac',
+  tfrac: 'frac',
   cdot: 'dot.op',
   to: 'arrow.r',
   rightarrow: 'arrow.r',

@@ -17,6 +17,8 @@ export function parseLatex(value: string) {
     .use(unifiedLatexAstComplier)
     .use(unifiedLatexAttachMacroArguments, {
       macros: {
+        dfrac: { signature: 'm m' },
+        tfrac: { signature: 'm m' },
         vec: { signature: 'm' },
         boldsymbol: { signature: 'm' },
         left: { signature: 'm' },

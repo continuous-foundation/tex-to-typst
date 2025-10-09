@@ -142,6 +142,9 @@ cases:
   - title: brackets
     tex: '\frac{1}{\tau(X_2)}'
     typst: 'frac(1, tau (X_2))'
+  - title: dfrac -> frac
+    tex: '\dfrac{1}{\tau(X_2)}'
+    typst: 'frac(1, tau (X_2))'
   - title: bar and nested bb
     skip: true
     tex: '\mathbb{\bar{R}}'
