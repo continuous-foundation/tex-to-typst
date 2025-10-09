@@ -42,6 +42,8 @@ function splitStrings(node: LatexNode) {
 
 export const typstMacros: Record<string, string | ((state: IState, node: LatexNode) => string)> = {
   $: '\\$',
+  dfrac: 'frac',
+  tfrac: 'frac',
   cdot: 'dot.op',
   to: 'arrow.r',
   rightarrow: 'arrow.r',
@@ -175,6 +177,9 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   ll: 'lt.double',
   neq: 'eq.not',
   otimes: 'times.circle',
+  odot: 'dot.circle',
+  oplus: 'plus.circle',
+  ominus: 'minus.circle',
   circ: 'compose',
   vert: 'bar.v',
   dot: 'dot',
@@ -205,15 +210,22 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   implies: 'arrow.r.double.long',
   ' ': '" "',
   mathbb: (state, node) => {
-    const text =
-      (((node.args?.slice(-1)[0] as LatexNode)?.content?.[0] as LatexNode)?.content as string) ??
-      '';
-    const letters = text
-      .split('')
-      .map((l) => `${l}${l}`)
-      .join(' ');
+    const arg = node.args?.[0];
+    if (!arg) return '';
+    const startPos = (state as any)._value.length;
+    // Render the children normally
+    state.writeChildren(arg);
+    // Get what was just rendered
+    const rendered = (state as any)._value.substring(startPos);
+    // Remove it from state
+    (state as any)._value = (state as any)._value.substring(0, startPos);
+    // Double all single CAPITAL letters in the rendered output
+    // Match isolated capital letters only (A-Z), not lowercase
+    const doubled = rendered.replace(/\b([A-Z])\b/g, '$1$1');
+    // Directly append the doubled version (don't use write() to avoid extra whitespace)
+    (state as any)._value += doubled;
     node.args = [];
-    return letters;
+    return '';
   },
   mathscr: (state) => {
     state.useMacro(`#let scr(it) = text(features: ("ss01",), box($cal(it)$))`);
