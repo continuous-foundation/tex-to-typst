@@ -130,6 +130,9 @@ cases:
   - title: mathbb all
     tex: '\mathbb{ABCDEFGHIJKLMNOPQRSTUVWXYZ}'
     typst: AA BB CC DD EE FF GG HH II JJ KK LL MM NN OO PP QQ RR SS TT UU VV WW XX YY ZZ
+  - title: mathbb lowercase not doubled
+    tex: '\mathbb{x} + \mathbb{R}'
+    typst: x + RR
   - title: ddot
     tex: 'q, \dot{q}, \ddot{q}'
     typst: q, dot(q), dot.double(q)
@@ -146,9 +149,11 @@ cases:
     tex: '\dfrac{1}{\tau(X_2)}'
     typst: 'frac(1, tau (X_2))'
   - title: bar and nested bb
-    skip: true
     tex: '\mathbb{\bar{R}}'
-    typst: 'bb(macron(R))'
+    typst: 'macron(RR)'
+  - title: mathbb with multiple levels of nesting
+    tex: '\mathbb{\hat{\tilde{X}}}^2 + \mathbb{\mathbf{R}}'
+    typst: 'hat(tilde(XX))^2 + bold(RR)'
   - title: 'Issue #7'
     tex: '\sqrt{\frac{1}{x^2 + y^2}}'
     typst: 'sqrt(frac(1, x^2 + y^2))'
