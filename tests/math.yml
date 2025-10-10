@@ -387,3 +387,6 @@ cases:
   - title: angle
     tex: '\langle A \rangle'
     typst: 'angle.l A angle.r'
+  - title: horizontal space
+    tex: '\hspace{1cm}'
+    typst: '#h(1cm)'

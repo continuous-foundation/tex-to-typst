@@ -215,6 +215,13 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   '!': '#h(-1em)',
   quad: 'quad',
   qquad: 'wide',
+  hspace: (state, node) => {
+    const dimension = (node.args?.slice(-1)[0].content as LatexNode[])
+      ?.map((n) => n.content ?? '')
+      .join('');
+    node.args = [];
+    return `#h(${dimension})`;
+  },
   wedge: 'and',
   sum: 'sum',
   prod: 'product',
