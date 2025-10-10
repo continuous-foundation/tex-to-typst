@@ -76,6 +76,7 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   check: 'caron',
   bar: 'macron',
   mathbf: 'bold',
+  mathsf: 'sans',
   boldsymbol: 'bold',
   bf: 'bold',
   mathrm: 'upright',

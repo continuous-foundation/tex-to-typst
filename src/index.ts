@@ -70,6 +70,13 @@ export function parseLatex(value: string) {
 export * from './macros.js';
 
 export function walkLatex(node: LatexNode) {
+  // For whitespace nodes, preserve the actual whitespace content from position data
+  if (node.type === 'whitespace' && !node.content) {
+    if (node.position?.start?.offset !== undefined && node.position?.end?.offset !== undefined) {
+      const length = node.position.end.offset - node.position.start.offset;
+      node.content = ' '.repeat(length);
+    }
+  }
   delete node.position;
   if (Array.isArray(node.content)) {
     const content = (node.content as LatexNode[]).map((n) => walkLatex(n)) as LatexNode[];
@@ -272,7 +279,11 @@ function convertText(state: IState, text: string): string {
 
 export function writeTypst(node: LatexNode, state: IState = new State()) {
   if (node.type === 'whitespace') {
-    // We are controlling whitespace in the renderer
+    // Preserve whitespace inside text functions, otherwise we control it
+    if ((state as any)._currentFunction === 'text') {
+      const whitespace = typeof node.content === 'string' ? node.content : ' ';
+      (state as any)._value += whitespace;
+    }
     return state;
   } else if (node.type === 'string') {
     // Values can come in as multiple characters
