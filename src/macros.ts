@@ -51,6 +51,7 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   leftarrow: 'arrow.l',
   Leftarrow: 'arrow.l.double',
   leftrightarrow: 'arrow.l.r',
+  Leftrightarrow: 'arrow.l.r.double',
   gets: 'arrow.l',
   rightharpoonup: 'harpoon.rt',
   rightharpoondown: 'harpoon.rb',
@@ -63,6 +64,10 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   nonumber: '',
   int: 'integral',
   iint: 'integral.double',
+  iiint: 'integral.triple',
+  oint: 'integral.cont',
+  oiint: 'integral.surf',
+  oiiint: 'integral.vol',
   sqrt: (state, node) => {
     if (isEmptyNode(node.args?.[0])) return 'sqrt';
     return 'root';
@@ -71,6 +76,7 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   check: 'caron',
   bar: 'macron',
   mathbf: 'bold',
+  mathsf: 'sans',
   boldsymbol: 'bold',
   bf: 'bold',
   mathrm: 'upright',
@@ -168,13 +174,22 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   varphi: 'phi.alt',
   varepsilon: 'epsilon',
   propto: 'prop',
+  mapsto: 'mapsto',
+  equiv: 'equiv',
+  nabla: 'nabla',
+  emptyset: 'emptyset',
+  varnothing: 'emptyset',
+  setminus: 'backslash',
   doteq: 'dot(eq)',
   ge: 'gt.eq',
   geq: 'gt.eq',
+  geqslant: 'gt.eq.slant',
   gg: 'gt.double',
   le: 'lt.eq',
   leq: 'lt.eq',
+  leqslant: 'lt.eq.slant',
   ll: 'lt.double',
+  approx: 'approx',
   neq: 'eq.not',
   otimes: 'times.circle',
   odot: 'dot.circle',
@@ -201,7 +216,15 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   '!': '#h(-1em)',
   quad: 'quad',
   qquad: 'wide',
+  hspace: (state, node) => {
+    const dimension = (node.args?.slice(-1)[0].content as LatexNode[])
+      ?.map((n) => n.content ?? '')
+      .join('');
+    node.args = [];
+    return `#h(${dimension})`;
+  },
   wedge: 'and',
+  sum: 'sum',
   prod: 'product',
   lfloor: 'floor.l',
   rfloor: 'floor.r',

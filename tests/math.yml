@@ -97,8 +97,8 @@ cases:
       }_{\mathbf{B}(\psi^{n+1})}&
       \end{align*}
     typst: |-
-      overbrace([ frac(1, Delta t) frac(diff bold(theta)^(n + 1), diff bold(psi)^(n + 1)) -bold(D) "diag"(bold(G) bold(psi)^(n + 1)) frac(diff bold(k)_(A v), diff bold(psi)^(n + 1)) -bold(D) "diag"(bold(k)_(A v) (bold(psi)^(n + 1) comma bold(m))) bold(G) -bold(G)_z frac(diff bold(k)_(A v), diff bold(psi)^(n + 1)) ], bold(A)_0 (bold(psi)^(n + 1))) frac(diff bold(psi)^(n + 1), diff bold(m)) \
-      + underbrace([ -frac(1, Delta t) frac(diff bold(theta)^n, diff bold(psi)^n) ], bold(A)_(-1) (bold(psi)^n)) frac(diff bold(psi)^n, diff bold(m)) = underbrace([ -bold(D) "diag"(bold(G) bold(psi)^(n + 1)) frac(diff bold(k)_(A v), diff bold(m)) -bold(G)_z frac(diff bold(k)_(A v), diff bold(m)) ], bold(B) (psi^(n + 1))) &
+      overbrace([ frac(1, Delta t) frac(diff bold(theta)^(n + 1), diff bold(psi)^(n + 1)) -bold(D) " diag"(bold(G) bold(psi)^(n + 1)) frac(diff bold(k)_(A v), diff bold(psi)^(n + 1)) -bold(D) " diag"(bold(k)_(A v) (bold(psi)^(n + 1) comma bold(m))) bold(G) -bold(G)_z frac(diff bold(k)_(A v), diff bold(psi)^(n + 1)) ], bold(A)_0 (bold(psi)^(n + 1))) frac(diff bold(psi)^(n + 1), diff bold(m)) \
+      + underbrace([ -frac(1, Delta t) frac(diff bold(theta)^n, diff bold(psi)^n) ], bold(A)_(-1) (bold(psi)^n)) frac(diff bold(psi)^n, diff bold(m)) = underbrace([ -bold(D) " diag"(bold(G) bold(psi)^(n + 1)) frac(diff bold(k)_(A v), diff bold(m)) -bold(G)_z frac(diff bold(k)_(A v), diff bold(m)) ], bold(B) (psi^(n + 1))) &
   - title: underbraces inside of a function
     description: For some reason the "_" here is treated as text, not a macro.
     tex: |
@@ -266,7 +266,7 @@ cases:
     typst: '\$ 50, 000'
   - title: quotes
     tex: 'V = \{ \text{"ng", "mr", "sr"} \}'
-    typst: 'V = {"\"ng\",\"mr\",\"sr\""}'
+    typst: 'V = {"\"ng\", \"mr\", \"sr\""}'
   - title: color
     tex: '\color{red}{V}'
     typst: '#text(fill: red)[$V$]'
@@ -387,3 +387,12 @@ cases:
   - title: angle
     tex: '\langle A \rangle'
     typst: 'angle.l A angle.r'
+  - title: horizontal space
+    tex: '\hspace{1cm}'
+    typst: '#h(1cm)'
+  - title: text with spaces
+    tex: '\text{ Hello  !!}'
+    typst: '" Hello  !!"'
+  - title: mathsf
+    tex: '\mathsf{k}'
+    typst: 'sans(k)'
