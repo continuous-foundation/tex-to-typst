@@ -68,6 +68,13 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   oint: 'integral.cont',
   oiint: 'integral.surf',
   oiiint: 'integral.vol',
+  varepsilon:	'epsilon', 
+  vartheta:	'theta.alt',
+  varpi:	'pi.alt',
+  varrho:	'rho.alt',
+  varsigma:	'sigma.alt',
+  varphi:	'phi',
+  
   sqrt: (state, node) => {
     if (isEmptyNode(node.args?.[0])) return 'sqrt';
     return 'root';
