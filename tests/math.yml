@@ -396,3 +396,6 @@ cases:
   - title: mathsf
     tex: '\mathsf{k}'
     typst: 'sans(k)'
+  - title: notin
+    tex: 'b \notin \operatorname{Col}(A)'
+    typst: 'b not in op("Col") (A)'
