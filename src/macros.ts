@@ -170,6 +170,7 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   cong: 'tilde.equiv',
   simeq: 'tilde.eq',
   ne: '!=',
+  hbar: 'planck.reduce',
   phi: 'phi.alt',
   varphi: 'phi.alt',
   varepsilon: 'epsilon',
