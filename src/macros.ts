@@ -235,6 +235,7 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   langle: 'angle.l',
   rangle: 'angle.r',
   implies: 'arrow.r.double.long',
+  notin: 'not in',
   ' ': '" "',
   mathbb: (state, node) => {
     const arg = node.args?.[0];
