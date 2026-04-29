@@ -6,7 +6,7 @@
     "Typst",
     "LaTeX"
   ],
-  "author": "Rowan Cockett <rowan@continuous.foundation>",
+  "author": "Rowan Cockett <rowan@continuousfoundation.org>",
   "license": "MIT",
   "sideEffects": false,
   "type": "module",
