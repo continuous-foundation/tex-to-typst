@@ -14,27 +14,23 @@ jobs:
         with:
           fetch-depth: 2
           submodules: recursive
-      - uses: actions/setup-node@v5
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20.x
-      - run: npm install
-      - run: npm run lint:format
-      - run: npm run lint
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun run lint:format
+      - run: bun run lint
   test:
     if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: ['18', '20']
-    name: Testing on node ${{ matrix.node }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
           submodules: recursive
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v5
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: ${{ matrix.node }}
-      - run: npm install
-      - run: npm run test
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun run test
+      - run: bun run build

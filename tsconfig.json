@@ -17,6 +17,7 @@
     "skipLibCheck": true,
     "strict": true,
     "lib": ["es2021", "DOM"],
+    "rootDir": "src",
     "typeRoots": [
       "./types",
       "./node_modules/@types",
