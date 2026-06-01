@@ -69,6 +69,115 @@ export function parseLatex(value: string) {
 
 export * from './macros.js';
 
+/**
+ * Macros that grab a single delimiter as their (mandatory) argument.
+ *
+ * Inside a brace group (e.g. a `\dfrac{...}` argument), the LaTeX string parser
+ * merges a delimiter and the characters that follow it into a single string node
+ * (e.g. `\left|a` becomes a `|a` string). The `m` argument then captures the whole
+ * merged string instead of just the delimiter, which breaks delimiter lookups.
+ * We normalize these nodes so the argument is always exactly the delimiter and any
+ * over-captured characters are restored as following siblings.
+ */
+const DELIMITER_MACROS = new Set([
+  'left',
+  'right',
+  'big',
+  'bigl',
+  'bigr',
+  'Big',
+  'Bigl',
+  'Bigr',
+  'bigg',
+  'biggl',
+  'biggr',
+  'Bigg',
+  'Biggl',
+  'Biggr',
+]);
+
+/** Matrix-like environments whose delimiter can be folded from surrounding `\left`/`\right`. */
+const FOLDABLE_MATRIX_ENVS = new Set(['matrix', 'array']);
+
+/**
+ * Map a raw `\left`/`\right` delimiter (the captured argument) to the value used by
+ * Typst's `mat(delim: ...)`. Returns `undefined` when the delimiter cannot be folded.
+ */
+function matDelimFromNode(node: LatexNode): string | null | undefined {
+  const arg = (node.args?.[0]?.content as LatexNode[])?.[0];
+  const delim = arg?.content as string | undefined;
+  switch (delim) {
+    case '|':
+    case 'vert':
+    case 'lvert':
+    case 'rvert':
+      return '|';
+    case 'Vert':
+    case 'lVert':
+    case 'rVert':
+      return '||';
+    case '(':
+    case ')':
+      return '(';
+    case '[':
+    case ']':
+      return '[';
+    case '{':
+    case '}':
+      return '{';
+    case '.':
+      return null; // explicit no delimiter
+    default:
+      return undefined;
+  }
+}
+
+/**
+ * Fold `\left<d> \begin{matrix}...\end{matrix} \right<d>` so the delimiters scale with
+ * the matrix instead of being rendered as fixed-height brackets beside it.
+ *
+ * - When both delimiters map to the same thing, fold them into the matrix `delim`.
+ * - When they differ (e.g. `\left. ... \right|`), wrap the matrix in Typst's `lr(...)`
+ *   so each side keeps its own delimiter while still scaling.
+ */
+function foldMatrixDelimiters(nodes: LatexNode[]): LatexNode[] {
+  const result: LatexNode[] = [];
+  for (let i = 0; i < nodes.length; i += 1) {
+    const node = nodes[i];
+    if (node.type === 'macro' && node.content === 'left') {
+      let j = i + 1;
+      while (j < nodes.length && nodes[j].type === 'whitespace') j += 1;
+      const env = nodes[j];
+      if (env?.type === 'environment' && FOLDABLE_MATRIX_ENVS.has(env.env)) {
+        let k = j + 1;
+        while (k < nodes.length && nodes[k].type === 'whitespace') k += 1;
+        const right = nodes[k];
+        if (right?.type === 'macro' && right.content === 'right') {
+          const leftDelim = matDelimFromNode(node);
+          const rightDelim = matDelimFromNode(right);
+          if (leftDelim !== undefined && rightDelim !== undefined) {
+            if (leftDelim === rightDelim) {
+              env.matDelim = leftDelim;
+              result.push(env);
+            } else {
+              // Delimiters differ: keep both via `lr(<left> mat(...) <right>)`
+              result.push({
+                type: 'macro',
+                content: 'lr',
+                args: [{ type: 'argument', content: [node, env, right] }],
+              });
+            }
+            i = k;
+            continue;
+          }
+        }
+      }
+    }
+    result.push(node);
+  }
+  return result;
+}
+
 export function walkLatex(node: LatexNode) {
   // For whitespace nodes, preserve the actual whitespace content from position data
   if (node.type === 'whitespace' && !node.content) {
@@ -136,6 +245,28 @@ export function walkLatex(node: LatexNode) {
         skip += 1;
       }
       if (
+        next.type === 'macro' &&
+        typeof next.content === 'string' &&
+        DELIMITER_MACROS.has(next.content) &&
+        Array.isArray(next.args?.[0]?.content)
+      ) {
+        // Split an over-captured delimiter argument (e.g. `|a`) so the macro keeps
+        // only the delimiter and the remaining characters become a following sibling.
+        const argContent = next.args[0].content as LatexNode[];
+        const first = argContent[0];
+        if (
+          first?.type === 'string' &&
+          typeof first.content === 'string' &&
+          first.content.length > 1
+        ) {
+          const full = first.content;
+          first.content = full[0];
+          list.push(next);
+          list.push({ type: 'string', content: full.slice(1) });
+          return list;
+        }
+      }
+      if (
         next.type === 'group' &&
         (next.content as LatexNode[])?.find?.((n) => n.type === 'macro' && n.content === 'over')
       ) {
@@ -152,8 +283,9 @@ export function walkLatex(node: LatexNode) {
       list.push(next);
       return list;
     }, [] as LatexNode[]);
-    node.content = parsed;
-    return { ...node, content: parsed };
+    const folded = foldMatrixDelimiters(parsed);
+    node.content = folded;
+    return { ...node, content: folded };
   }
   if (Array.isArray(node.args)) {
     const args = (node.args as LatexNode[]).map((n) => walkLatex(n)) as LatexNode[];

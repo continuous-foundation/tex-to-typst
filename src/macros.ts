@@ -126,6 +126,11 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
     if (left === '|') return '|';
     if (left === '.') return '';
     if (left === 'lbrack') return '[';
+    if (left === 'vert' || left === 'lvert') return '|';
+    if (left === 'Vert' || left === 'lVert') return 'bar.v.double';
+    if (left === 'langle') return 'angle.l';
+    if (left === 'lfloor') return 'floor.l';
+    if (left === 'lceil') return 'ceil.l';
     throw new Error(`Undefined left bracket: ${left}`);
   },
   lbrack: '[',
@@ -139,6 +144,11 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
     if (right === '|') return '|';
     if (right === '.') return '';
     if (right === 'rbrack') return ']';
+    if (right === 'vert' || right === 'rvert') return '|';
+    if (right === 'Vert' || right === 'rVert') return 'bar.v.double';
+    if (right === 'rangle') return 'angle.r';
+    if (right === 'rfloor') return 'floor.r';
+    if (right === 'rceil') return 'ceil.r';
     throw new Error(`Undefined right bracket: ${right}`);
   },
   rbrack: ']',
@@ -201,6 +211,11 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   ominus: 'minus.circle',
   circ: 'compose',
   vert: 'bar.v',
+  lvert: 'bar.v',
+  rvert: 'bar.v',
+  Vert: 'bar.v.double',
+  lVert: 'bar.v.double',
+  rVert: 'bar.v.double',
   dot: 'dot',
   ddot: 'dot.double',
   dots: 'dots.h',
@@ -288,6 +303,34 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
     state.writeChildren(args?.[1] as LatexNode);
     return '';
   },
+  lr: (state, node) => {
+    // Built by `foldMatrixDelimiters`: content is [leftNode, matrixEnv, rightNode].
+    // Delimiters are appended directly (not via `write`) so they sit tight against the
+    // matrix and keep their literal form (e.g. `|`) instead of being spelled out.
+    const content = (node.args?.[0]?.content as LatexNode[]) ?? [];
+    const [leftNode, envNode, rightNode] = content;
+    node.args = [];
+    const left = typstMacros.left as (s: IState, n: LatexNode) => string;
+    const right = typstMacros.right as (s: IState, n: LatexNode) => string;
+    state.openFunction('lr');
+    let leftLen = 0;
+    if (leftNode) {
+      const sym = left(state, leftNode);
+      (state as any)._value += sym;
+      leftLen = sym.length;
+    }
+    const posAfterLeft = (state as any)._value.length;
+    if (envNode) state.writeChildren({ type: 'group', content: [envNode] });
+    // Drop the whitespace the matrix's opening inserts so the left delimiter sits tight
+    if (leftLen > 0 && (state as any)._value[posAfterLeft] === ' ') {
+      (state as any)._value =
+        (state as any)._value.slice(0, posAfterLeft) +
+        (state as any)._value.slice(posAfterLeft + 1);
+    }
+    if (rightNode) (state as any)._value += right(state, rightNode);
+    state.closeFunction();
+    return '';
+  },
   color: (state, node) => {
     const [fill, children] = node.args ?? [];
     const color = (fill.content?.[0] as LatexNode)?.content as string;
@@ -303,7 +346,10 @@ const matrixEnv = (delim?: string) => (state: IState, node: LatexNode) => {
   state.data.inArray = true;
   state.data.previousMatRows = 0;
   state.openFunction('mat');
-  state.write(`delim: ${delim ? `"${delim}"` : '#none'},`);
+  // `matDelim` is set when a surrounding `\left`/`\right` delimiter has been folded in.
+  const override = node.matDelim as string | null | undefined;
+  const resolved = override === undefined ? delim : override;
+  state.write(`delim: ${resolved ? `"${resolved}"` : '#none'},`);
   state.writeChildren(node);
   state.closeFunction();
   state.data.inArray = false;

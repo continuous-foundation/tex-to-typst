@@ -27,8 +27,18 @@ export function areBracketsBalanced(input: string): boolean {
     '}': '{',
   };
 
+  // Brackets inside Typst string literals (e.g. `delim: "["`) are not structural
+  let inString = false;
+
   // Check each character in the string
-  for (const char of input) {
+  for (let i = 0; i < input.length; i += 1) {
+    const char = input[i];
+    // Toggle string state on unescaped double quotes and skip their contents
+    if (char === '"' && input[i - 1] !== '\\') {
+      inString = !inString;
+      continue;
+    }
+    if (inString) continue;
     // If it’s an opening bracket, push it to the stack
     if (char === '(' || char === '[' || char === '{') {
       stack.push(char);
