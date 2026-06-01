@@ -141,7 +141,10 @@ cases:
     typst: 'dot(x)^2'
   - title: mat
     tex: 'x(t) = \left[ \begin{array}{c} q(t) & x \\ \dot{q}(t) & x \end{array}\right]'
-    typst: 'x (t) = [ mat(delim: #none, q (t), x; dot(q) (t), x) ]'
+    typst: 'x (t) = mat(delim: "[", q (t), x; dot(q) (t), x)'
+  - title: mat no left delimiter (use parens internally)
+    tex: 'x(t) = \left. \begin{array}{c} q(t) & x \\ \dot{q}(t) & x \end{array}\right]'
+    typst: 'x (t) = lr(mat(delim: #none, q paren.l t paren.r, x; dot(q) paren.l t paren.r, x)])'
   - title: brackets
     tex: '\frac{1}{\tau(X_2)}'
     typst: 'frac(1, tau (X_2))'
@@ -399,3 +402,54 @@ cases:
   - title: notin
     tex: 'b \notin \operatorname{Col}(A)'
     typst: 'b not in op("Col") (A)'
+  - title: bar delimiter standalone
+    tex: '\left|a\right|'
+    typst: '| a |'
+  - title: bar delimiter around fraction
+    tex: '\left|\frac{a}{b}\right|'
+    typst: '| frac(a, b) |'
+  - title: paren delimiter inside fraction
+    tex: '\dfrac{\left(a\right)}{b}'
+    typst: 'frac((a), b)'
+  - title: bracket delimiter inside fraction
+    tex: '\dfrac{\left[a\right]}{b}'
+    typst: 'frac([ a ], b)'
+  - title: bar delimiter inside fraction
+    description: 'Regression: sized | delimiter merged with following char inside a frac argument'
+    tex: '\dfrac{\left|a\right|}{b}'
+    typst: 'frac(| a |, b)'
+  - title: bigl bar delimiter inside fraction
+    tex: '\dfrac{\bigl|a\bigr|}{b}'
+    typst: 'frac(#scale(x: 120%, y: 120%)[$bar.v$] a #scale(x: 120%, y: 120%)[$bar.v$], b)'
+  - title: lvert rvert inside fraction
+    tex: '\dfrac{\lvert a\rvert}{b}'
+    typst: 'frac(bar.v a bar.v, b)'
+  - title: bare bars inside fraction
+    tex: '\dfrac{|a|}{b}'
+    typst: 'frac(| a |, b)'
+  - title: bar delimiter inside fraction with expression
+    tex: '\dfrac{\left|ab+c\right|}{b}'
+    typst: 'frac(| a b + c |, b)'
+  - title: left lvert right rvert
+    tex: '\left\lvert a\right\rvert'
+    typst: '| a |'
+  - title: Vert norm delimiter
+    tex: '\left\Vert x\right\Vert'
+    typst: 'bar.v.double x bar.v.double'
+  - title: bar delimiter around matrix determinant
+    tex: |-
+      \left| \begin{matrix}
+      \widehat{\mathbf{x}} & \widehat{\mathbf{y}} & \widehat{\mathbf{z}} \\
+      0 & 0 & 1 \\
+      \frac{u}{\sqrt{u^{2} + v^{2} + w^{2}}} & \frac{v}{\sqrt{u^{2} + v^{2} + w^{2}}} & \frac{w}{\sqrt{u^{2} + v^{2} + w^{2}}} \\
+      \end{matrix} \right|
+    typst: 'mat(delim: "|", hat(bold(x)), hat(bold(y)), hat(bold(z)); 0, 0, 1; frac(u, sqrt(u^2 + v^2 + w^2)), frac(v, sqrt(u^2 + v^2 + w^2)), frac(w, sqrt(u^2 + v^2 + w^2));)'
+  - title: bracket delimiter folds into matrix
+    tex: '\left[ \begin{matrix} a & b \\ c & d \end{matrix} \right]'
+    typst: 'mat(delim: "[", a, b; c, d)'
+  - title: mismatched delimiters around matrix use lr
+    tex: '\left. \begin{matrix} a & b \end{matrix} \right|'
+    typst: 'lr(mat(delim: #none, a, b)|)'
+  - title: mismatched bracket delimiters around matrix use lr
+    tex: '\left[ \begin{matrix} a & b \end{matrix} \right)'
+    typst: 'lr([mat(delim: #none, a, b)))'
