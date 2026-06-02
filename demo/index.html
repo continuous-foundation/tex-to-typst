@@ -149,6 +149,26 @@
         max-width: 60%;
       }
 
+      .copy-button {
+        font-size: 0.75rem;
+        color: #444;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 0 0.5rem;
+        height: 1.5rem;
+        background: #fafafa;
+        cursor: pointer;
+      }
+
+      .copy-button:hover:not(:disabled) {
+        background: #f0f0f0;
+      }
+
+      .copy-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
       textarea,
       .output {
         flex: 1;
@@ -333,6 +353,7 @@
       <div class="pane">
         <div class="pane-header">
           <div class="pane-label">Typst</div>
+          <button type="button" id="copy" class="copy-button" disabled>Copy</button>
         </div>
         <div class="output" id="output"></div>
         <div class="macros" id="macros"></div>
@@ -359,6 +380,9 @@
       const latexPreview = document.getElementById("latex-preview");
       const status = document.getElementById("status");
       const examplesSelect = document.getElementById("examples");
+      const copyButton = document.getElementById("copy");
+
+      let lastTypst = "";
 
       const examples = [
         {
@@ -486,12 +510,16 @@
           output.textContent = "";
           output.className = "output";
           macros.textContent = "";
+          lastTypst = "";
+          copyButton.disabled = true;
           return;
         }
         try {
           const result = texToTypst(tex);
           output.textContent = result.value;
           output.className = "output";
+          lastTypst = result.value;
+          copyButton.disabled = !lastTypst;
           if (result.macros && result.macros.size > 0) {
             macros.innerHTML = '<span class="macros-label">Required Typst preamble</span>';
             macros.append([...result.macros].join("\n"));
@@ -502,8 +530,26 @@
           output.textContent = err.message;
           output.className = "output error";
           macros.textContent = "";
+          lastTypst = "";
+          copyButton.disabled = true;
         }
       }
+
+      copyButton.addEventListener("click", async () => {
+        if (!lastTypst) return;
+        try {
+          await navigator.clipboard.writeText(lastTypst);
+          copyButton.textContent = "Copied!";
+          setTimeout(() => {
+            copyButton.textContent = "Copy";
+          }, 1500);
+        } catch {
+          status.textContent = "Copy failed";
+          setTimeout(() => {
+            status.textContent = "Ready";
+          }, 1500);
+        }
+      });
 
       input.addEventListener("input", convert);
 
