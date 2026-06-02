@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Convert LaTeX to Typst</title>
+    <meta
+      name="description"
+      content="An open-source utility for translating LaTeX math into equivalent Typst markup. Type LaTeX on the left and see the Typst output instantly."
+    />
+    <link rel="icon" href="https://cdn.curvenote.com/static/site/csf/icon.svg" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+      crossorigin="anonymous"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: system-ui, sans-serif;
+        background: #f5f5f5;
+        color: #111;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        padding: 1.25rem 2rem;
+        border-bottom: 1px solid #ddd;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+
+      header h1 {
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+
+      .header-nav {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+      }
+
+      .header-nav a {
+        font-size: 0.8rem;
+        color: #666;
+        text-decoration: none;
+      }
+
+      .header-nav a:hover {
+        color: #111;
+      }
+
+      .header-nav .csf-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: #444;
+      }
+
+      .header-nav .csf-link img {
+        height: 1.1em;
+      }
+
+      .intro {
+        padding: 1.5rem 2rem;
+        background: #fff;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .intro p {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: #444;
+      }
+
+      .intro p + p {
+        margin-top: 0.75rem;
+      }
+
+      .intro code {
+        font-family: "Fira Code", "Cascadia Code", monospace;
+        font-size: 0.85em;
+        background: #f0f0f0;
+        padding: 0.1em 0.35em;
+        border-radius: 4px;
+      }
+
+      .intro .note {
+        font-size: 0.85rem;
+        color: #b06a00;
+      }
+
+      main {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        min-height: 320px;
+      }
+
+      .pane {
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid #ddd;
+        min-width: 0;
+      }
+
+      .pane:last-child {
+        border-right: none;
+      }
+
+      .pane-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        height: 2.25rem;
+        padding: 0 1rem;
+        background: #fff;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .pane-label {
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #888;
+      }
+
+      .examples-select {
+        font-size: 0.75rem;
+        color: #444;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 0 0.5rem;
+        height: 1.5rem;
+        background: #fafafa;
+        max-width: 60%;
+      }
+
+      textarea,
+      .output {
+        flex: 1;
+        padding: 1rem;
+        font-family: "Fira Code", "Cascadia Code", monospace;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        border: none;
+        outline: none;
+        resize: none;
+        background: #fafafa;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+
+      textarea {
+        background: #fff;
+      }
+
+      .output {
+        color: #1a5c9a;
+        background: #f8fbff;
+      }
+
+      .output.error {
+        color: #c0392b;
+        background: #fff8f8;
+      }
+
+      .macros {
+        border-top: 1px solid #ddd;
+        background: #fffdf5;
+        font-family: "Fira Code", "Cascadia Code", monospace;
+        font-size: 0.8rem;
+        line-height: 1.6;
+        color: #6b5b00;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+
+      .macros:not(:empty) {
+        padding: 0.75rem 1rem;
+      }
+
+      .macros .macros-label {
+        display: block;
+        font-size: 0.65rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #b0a060;
+        margin-bottom: 0.35rem;
+      }
+
+      .latex-preview {
+        flex-shrink: 0;
+        border-top: 1px solid #ddd;
+        background: #fafafa;
+        padding: 1rem;
+        overflow: auto;
+        max-height: 40%;
+        min-height: 4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .latex-preview.error {
+        align-items: flex-start;
+        justify-content: flex-start;
+        color: #c0392b;
+        font-size: 0.8rem;
+        font-family: system-ui, sans-serif;
+        background: #fff8f8;
+      }
+
+      #status {
+        padding: 0.4rem 1rem;
+        font-size: 0.75rem;
+        color: #999;
+        background: #fff;
+        border-top: 1px solid #eee;
+        text-align: center;
+      }
+
+      footer {
+        position: sticky;
+        bottom: 0;
+        padding: 0.75rem 2rem;
+        background: #111;
+        color: #ddd;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+
+      footer a {
+        color: #fff;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
+      footer a:hover {
+        text-decoration: underline;
+      }
+
+      footer img {
+        height: 1.1em;
+        vertical-align: middle;
+      }
+
+      @media (max-width: 640px) {
+        main {
+          grid-template-columns: 1fr;
+        }
+
+        .pane {
+          border-right: none;
+          border-bottom: 1px solid #ddd;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Convert LaTeX to Typst</h1>
+      <nav class="header-nav" aria-label="Project links">
+        <a href="https://www.npmjs.com/package/tex-to-typst" target="_blank" rel="noopener">npm</a>
+        <a href="https://github.com/continuous-foundation/tex-to-typst" target="_blank" rel="noopener">
+          GitHub
+        </a>
+      </nav>
+    </header>
+
+    <section class="intro">
+      <p>
+        <strong>tex-to-typst</strong> is an open-source javascript utility that translates
+        <a href="https://www.latex-project.org/" target="_blank" rel="noopener">LaTeX</a> math
+        markup into equivalent <a href="https://typst.app/" target="_blank" rel="noopener">Typst</a>
+        markup. Type any LaTeX math expression on the left and the converted Typst appears instantly
+        on the right. Install it with <code>npm install tex-to-typst</code> to use it in your own
+        project.
+      </p>
+      <p class="note">
+        The library may not yet handle every LaTeX expression. Found a conversion that
+        doesn't work?
+        <a
+          href="https://github.com/continuous-foundation/tex-to-typst/issues/new"
+          target="_blank"
+          rel="noopener"
+          >Submit an issue</a
+        >
+        or
+        <a
+          href="https://github.com/continuous-foundation/tex-to-typst/issues"
+          target="_blank"
+          rel="noopener"
+          >browse existing issues</a
+        >
+        on GitHub.
+      </p>
+    </section>
+
+    <main>
+      <div class="pane">
+        <div class="pane-header">
+          <div class="pane-label">LaTeX</div>
+          <select id="examples" class="examples-select" aria-label="Example equations">
+            <option value="">Examples…</option>
+          </select>
+        </div>
+        <textarea
+          id="input"
+          spellcheck="false"
+          placeholder="\frac{a}{b} + \sqrt{x^2 + y^2}"
+        ></textarea>
+        <div class="latex-preview" id="latex-preview"></div>
+      </div>
+      <div class="pane">
+        <div class="pane-header">
+          <div class="pane-label">Typst</div>
+        </div>
+        <div class="output" id="output"></div>
+        <div class="macros" id="macros"></div>
+      </div>
+    </main>
+
+    <div id="status">Loading…</div>
+
+    <footer>
+      <span>Project by</span>
+      <a href="https://continuousfoundation.org" target="_blank" rel="noopener">
+        Continuous Science Foundation
+        <img src="https://cdn.curvenote.com/static/site/csf/icon.svg" alt="Continuous Science Foundation logo" />
+      </a>
+    </footer>
+
+    <script type="module">
+      import { texToTypst } from "https://esm.sh/tex-to-typst";
+      import katex from "https://esm.sh/katex";
+
+      const input = document.getElementById("input");
+      const output = document.getElementById("output");
+      const macros = document.getElementById("macros");
+      const latexPreview = document.getElementById("latex-preview");
+      const status = document.getElementById("status");
+      const examplesSelect = document.getElementById("examples");
+
+      const examples = [
+        {
+          title: "Quadratic formula",
+          tex: String.raw`\frac{-b \pm \sqrt{b^2 - 4ac}}{2a}`,
+        },
+        {
+          title: "Fractions and vectors",
+          tex: String.raw`\frac{1}{4} \sum_{i=1}^4 \mathbf{P}_i^\top \sqrt{v} \mathbf{\Sigma}^{-1} \sqrt{v} \mathbf{P}_i \mathbf{j} = \mathbf{D}^\top v \phi`,
+        },
+        {
+          title: "Integrals and vec",
+          tex: String.raw`\nabla \cdot \vec{j}(p) = \lim_{v \to \{ p \}} = \int \int_{S(v)} \frac{\vec{j} \cdot \vec{n}}{v} dS`,
+        },
+        {
+          title: "Cube root",
+          tex: String.raw`\sqrt[3]{x}`,
+        },
+        {
+          title: "Plus minus",
+          tex: String.raw`q = \pm I`,
+        },
+        {
+          title: "Left and right brackets",
+          tex: String.raw`\left[ \mathbf{A} \right)`,
+        },
+        {
+          title: "Blackboard bold",
+          tex: String.raw`\mathbb{R}`,
+        },
+        {
+          title: "Matrix",
+          tex: String.raw`x(t) = \left[ \begin{array}{c} q(t) & x \\ \dot{q}(t) & x \end{array}\right]`,
+        },
+        {
+          title: "Nested scripts",
+          tex: String.raw`r_{s^+}`,
+        },
+        {
+          title: "Text functions",
+          tex: String.raw`\text{diag}({\mathbf{v}}) \mathbf{D}\mathbf{M}_f(\sigma^{-1})^{-1}\mathbf{D}^\top\text{diag}({\mathbf{v}})\phi = \mathbf{q}`,
+        },
+        {
+          title: "Nested sqrt and fraction",
+          tex: String.raw`\sqrt{\frac{1}{x^2 + y^2}}`,
+        },
+        {
+          title: "Overset",
+          tex: String.raw`\overset{*}{y_i}`,
+        },
+        {
+          title: "Underset",
+          tex: String.raw`\sqrt{\underset{*}{y_i}}`,
+        },
+        {
+          title: "Calligraphic and script",
+          tex: String.raw`\mathcal{F} \ne \mathscr{C}`,
+        },
+        {
+          title: "Aligned system",
+          tex: String.raw`\begin{aligned}
+\max_{x_1,x_2} & z = 3 x_1 + 4 x_2 \\
+\mbox{subject to} & 2 x_1 + 5 x_2 \le 30 \\
+& 4 x_1 + 2 x_2 \le 20 \\
+& x_1, x_2 \ge 0
+\end{aligned}`,
+        },
+        {
+          title: "Bmatrix",
+          tex: String.raw`\begin{bmatrix}
+    a & b \\
+    c & d
+\end{bmatrix}`,
+        },
+        {
+          title: "Color",
+          tex: String.raw`\color{red}{V}`,
+        },
+        {
+          title: "Derivatives",
+          tex: String.raw`q, \dot{q}, \ddot{q}`,
+        },
+        {
+          title: "Stackrel",
+          tex: String.raw`\stackrel { d } {\to} N(0, \sigma^2)`,
+        },
+        {
+          title: "Overrightarrow",
+          tex: String.raw`\overrightarrow{x}`,
+        },
+        {
+          title: "Big delimiters",
+          tex: String.raw`\frac{1}{4i} \bigg( \frac{-i}{2} e^{2i\omega} - \frac{i}{2} e^{-2i\omega} + C_1 \bigg)`,
+        },
+      ];
+
+      for (const example of examples) {
+        const option = document.createElement("option");
+        option.value = example.tex;
+        option.textContent = example.title;
+        examplesSelect.append(option);
+      }
+
+      status.textContent = "Ready";
+
+      function renderLatex(tex) {
+        latexPreview.className = "latex-preview";
+        latexPreview.textContent = "";
+        if (!tex) return;
+        try {
+          katex.render(tex, latexPreview, {
+            displayMode: true,
+            throwOnError: true,
+          });
+        } catch (err) {
+          latexPreview.className = "latex-preview error";
+          latexPreview.textContent = err.message;
+        }
+      }
+
+      function convert() {
+        const tex = input.value.trim();
+        renderLatex(tex);
+        if (!tex) {
+          output.textContent = "";
+          output.className = "output";
+          macros.textContent = "";
+          return;
+        }
+        try {
+          const result = texToTypst(tex);
+          output.textContent = result.value;
+          output.className = "output";
+          if (result.macros && result.macros.size > 0) {
+            macros.innerHTML = '<span class="macros-label">Required Typst preamble</span>';
+            macros.append([...result.macros].join("\n"));
+          } else {
+            macros.textContent = "";
+          }
+        } catch (err) {
+          output.textContent = err.message;
+          output.className = "output error";
+          macros.textContent = "";
+        }
+      }
+
+      input.addEventListener("input", convert);
+
+      examplesSelect.addEventListener("change", () => {
+        if (!examplesSelect.value) return;
+        input.value = examplesSelect.value;
+        convert();
+      });
+
+      input.value = examples[0].tex;
+      convert();
+    </script>
+  </body>
+</html>

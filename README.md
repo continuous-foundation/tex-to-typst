@@ -6,6 +6,8 @@
 
 A utility for translating LaTeX math to typst.
 
+**[Try the live demo →](https://continuous-foundation.github.io/tex-to-typst/)**
+
 > **Note**: The library is in alpha, it will likely not work for the majority of math at the moment! More updates to come soon!
 
 ```shell
