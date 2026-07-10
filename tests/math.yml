@@ -465,3 +465,9 @@ cases:
   - title: mismatched bracket delimiters around matrix use lr
     tex: '\left[ \begin{matrix} a & b \end{matrix} \right)'
     typst: 'lr([mat(delim: #none, a, b)))'
+  - title: cases environment
+    tex: 'A_0(x) = \begin{cases} A(x), & A(x) \geq c \\ 0, & \text{otherwise} \end{cases}'
+    typst: 'A_0 (x) = cases(A (x), A (x) gt.eq c, 0, "otherwise")'
+  - title: cases environment with floor
+    tex: '\text{wrap}(i; n) = \begin{cases} i, & i \leq \lfloor n/2 \rfloor \\ i - n, & \text{otherwise.} \end{cases}'
+    typst: '"wrap"(i \; n) = cases(i, i lt.eq floor.l n \/ 2 floor.r, i -n, "otherwise.")'
