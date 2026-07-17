@@ -373,7 +373,7 @@ cases:
     tex: |
       \mathbf{u} \wedge \mathbf{v} \equiv
       \mathbf{u} \otimes \mathbf{v} - \mathbf{v} \otimes \mathbf{u}\,.
-    typst: 'bold(u) and bold(v) equiv bold(u) times.circle bold(v) -bold(v) times.circle bold(u) thin.'
+    typst: 'bold(u) and bold(v) equiv bold(u) times.o bold(v) -bold(v) times.o bold(u) thin.'
   - title: frac
     tex: '\vec{e}_i = \frac{\partial\mathbf{r}}{\partial x^i} \equiv \frac{\partial}{\partial x^i}\,,'
     typst: 'arrow(e)_i = frac(diff bold(r), diff x^i) equiv frac(diff, diff x^i) thin,'
@@ -383,7 +383,7 @@ cases:
   - title: cdot
     description: The space in `dot.op()` vs `dot.op ()` is important!!
     tex: '(dx^1 \wedge dx^2 \wedge dx^4) \cdot (\mathbf{u} \otimes \mathbf{v} \otimes \mathbf{w})='
-    typst: '(d x^1 and d x^2 and d x^4) dot.op (bold(u) times.circle bold(v) times.circle bold(w)) ='
+    typst: '(d x^1 and d x^2 and d x^4) dot.op (bold(u) times.o bold(v) times.o bold(w)) ='
   - title: complex brackets
     tex: '\partial_{[i} f_{j]}'
     typst: 'diff_(bracket.l i) f_(j bracket.r)'
@@ -407,7 +407,7 @@ cases:
     typst: 'sans(k)'
   - title: notin
     tex: 'b \notin \operatorname{Col}(A)'
-    typst: 'b not in op("Col") (A)'
+    typst: 'b in.not op("Col") (A)'
   - title: bar delimiter standalone
     tex: '\left|a\right|'
     typst: '| a |'

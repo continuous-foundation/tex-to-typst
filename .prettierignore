@@ -1,0 +1,5 @@
+dist
+node_modules
+
+# Generated from symbols.html by scripts/generate-symbols.ts
+src/symbols.ts

@@ -1,5 +1,6 @@
 import type { IState, LatexNode } from './types.js';
 import { BRACKETS } from './utils.js';
+import { symbols } from './symbols.js';
 
 function isEmptyNode(node?: LatexNode): boolean {
   if (!node?.content || node.content.length === 0) return true;
@@ -40,34 +41,50 @@ function splitStrings(node: LatexNode) {
   }
 }
 
-export const typstMacros: Record<string, string | ((state: IState, node: LatexNode) => string)> = {
+/**
+ * LaTeX names that take an argument and render as a Typst *function* of the same name
+ * (e.g. `\overbrace{x}` -> `overbrace(x)`). The symbol table maps these to the bare
+ * bracket glyph (e.g. `brace.t`), which is the wrong shape here, so we skip them and let
+ * the name fall through unchanged.
+ */
+const ANNOTATION_MACROS = new Set([
+  'overbrace',
+  'underbrace',
+  'overparen',
+  'underparen',
+  'overline',
+  'underline',
+]);
+
+/**
+ * Base LaTeX -> Typst macro mappings, generated from `symbols.html` (see `symbols.ts`).
+ *
+ * Keyed by the LaTeX name without its leading backslash (e.g. `langle`), mapping to the
+ * canonical Typst (codex) name (e.g. `chevron.l`). Deprecated Typst names are skipped so
+ * we never emit output the Typst compiler warns about. When several symbols share a LaTeX
+ * name we prefer the entry whose Typst name matches the LaTeX name (e.g. `\top` -> `top`
+ * rather than `tack.b`), otherwise the first one wins. These are overridden by the curated
+ * `baseMacros` below, which take precedence for the handful of names we map differently.
+ */
+const symbolMacros: Record<string, string> = {};
+for (const [typst, sym] of Object.entries(symbols)) {
+  if (sym.deprecated) continue;
+  const key = sym.latex.replace(/^\\/, '');
+  if (!key || ANNOTATION_MACROS.has(key)) continue;
+  const existing = symbolMacros[key];
+  if (existing === undefined || (existing !== key && typst === key)) {
+    symbolMacros[key] = typst;
+  }
+}
+
+const baseMacros: Record<string, string | ((state: IState, node: LatexNode) => string)> = {
   $: '\\$',
   dfrac: 'frac',
   tfrac: 'frac',
-  cdot: 'dot.op',
   to: 'arrow.r',
-  rightarrow: 'arrow.r',
-  Rightarrow: 'arrow.r.double',
-  leftarrow: 'arrow.l',
-  Leftarrow: 'arrow.l.double',
-  leftrightarrow: 'arrow.l.r',
-  Leftrightarrow: 'arrow.l.r.double',
   gets: 'arrow.l',
-  rightharpoonup: 'harpoon.rt',
-  rightharpoondown: 'harpoon.rb',
-  rightleftharpoons: 'harpoons.rtlb',
-  leftharpoonup: 'harpoon.lt',
-  leftharpoondown: 'harpoon.lb',
-  leftrightharpoons: 'harpoons.ltrb',
   infin: 'infinity', // This is a mathjax only thing, https://docs.mathjax.org/en/v2.7-latest/tex.html#i
-  infty: 'infinity', // oo
   nonumber: '',
-  int: 'integral',
-  iint: 'integral.double',
-  iiint: 'integral.triple',
-  oint: 'integral.cont',
-  oiint: 'integral.surf',
-  oiiint: 'integral.vol',
   sqrt: (state, node) => {
     if (isEmptyNode(node.args?.[0])) return 'sqrt';
     return 'root';
@@ -94,7 +111,6 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   },
   mathcal: 'cal',
   mathfrak: 'frak',
-  pm: 'plus.minus',
   partial: 'diff',
   _: (state, node) => {
     splitStrings(node);
@@ -177,7 +193,6 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
     return '\\\n';
   },
   sim: 'tilde',
-  cong: 'tilde.equiv',
   simeq: 'tilde.eq',
   ne: '!=',
   hbar: 'planck.reduce',
@@ -187,45 +202,22 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   vartheta: 'theta.alt',
   varrho: 'rho.alt',
   varsigma: 'sigma.alt',
-  propto: 'prop',
-  mapsto: 'mapsto',
-  equiv: 'equiv',
-  nabla: 'nabla',
   emptyset: 'emptyset',
-  varnothing: 'emptyset',
   setminus: 'backslash',
-  doteq: 'dot(eq)',
   ge: 'gt.eq',
-  geq: 'gt.eq',
-  geqslant: 'gt.eq.slant',
-  gg: 'gt.double',
   le: 'lt.eq',
-  leq: 'lt.eq',
-  leqslant: 'lt.eq.slant',
-  ll: 'lt.double',
-  approx: 'approx',
   neq: 'eq.not',
-  otimes: 'times.circle',
-  odot: 'dot.circle',
-  oplus: 'plus.circle',
-  ominus: 'minus.circle',
   circ: 'compose',
-  vert: 'bar.v',
   lvert: 'bar.v',
   rvert: 'bar.v',
-  Vert: 'bar.v.double',
   lVert: 'bar.v.double',
   rVert: 'bar.v.double',
   dot: 'dot',
   ddot: 'dot.double',
   dots: 'dots.h',
   ldots: 'dots.h',
-  vdots: 'dots.v',
-  ddots: 'dots.down',
-  subseteq: 'subset.eq',
   cdots: 'dots.h.c',
   cap: 'sect',
-  cup: 'union',
   widehat: 'hat',
   widetilde: 'tilde',
   // Spaces
@@ -242,15 +234,7 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
     node.args = [];
     return `#h(${dimension})`;
   },
-  wedge: 'and',
-  sum: 'sum',
-  prod: 'product',
-  lfloor: 'floor.l',
-  rfloor: 'floor.r',
-  langle: 'chevron.l',
-  rangle: 'chevron.r',
   implies: 'arrow.r.double.long',
-  notin: 'not in',
   ' ': '" "',
   mathbb: (state, node) => {
     const arg = node.args?.[0];
@@ -340,6 +324,15 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
     state.closeFunction();
     return '';
   },
+};
+
+/**
+ * The full macro table: generated symbol mappings augmented with the curated `baseMacros`.
+ * `baseMacros` is spread last so hand-tuned entries win over the generated defaults.
+ */
+export const typstMacros: Record<string, string | ((state: IState, node: LatexNode) => string)> = {
+  ...symbolMacros,
+  ...baseMacros,
 };
 
 const matrixEnv = (delim?: string) => (state: IState, node: LatexNode) => {
