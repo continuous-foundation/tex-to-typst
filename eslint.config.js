@@ -6,7 +6,8 @@ import prettierConfig from 'eslint-config-prettier';
 
 export default tseslint.config(
   {
-    ignores: ['dist/**', 'node_modules/**'],
+    // `src/symbols.ts` is generated from `symbols.html`; skip prettier/lint on it.
+    ignores: ['dist/**', 'node_modules/**', 'src/symbols.ts'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
