@@ -389,13 +389,19 @@ cases:
     typst: 'diff_(bracket.l i) f_(j bracket.r)'
   - title: angle
     tex: '\langle A \rangle'
-    typst: 'angle.l A angle.r'
+    typst: 'chevron.l A chevron.r'
+  - title: left right angle
+    tex: '\left\langle A \right\rangle'
+    typst: 'chevron.l A chevron.r'
   - title: horizontal space
     tex: '\hspace{1cm}'
     typst: '#h(1cm)'
   - title: text with spaces
     tex: '\text{ Hello  !!}'
     typst: '" Hello  !!"'
+  - title: text
+    tex: '\text{text}'
+    typst: '"text"'
   - title: mathsf
     tex: '\mathsf{k}'
     typst: 'sans(k)'
