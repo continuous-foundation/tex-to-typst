@@ -128,7 +128,7 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
     if (left === 'lbrack') return '[';
     if (left === 'vert' || left === 'lvert') return '|';
     if (left === 'Vert' || left === 'lVert') return 'bar.v.double';
-    if (left === 'langle') return 'angle.l';
+    if (left === 'langle') return 'chevron.l';
     if (left === 'lfloor') return 'floor.l';
     if (left === 'lceil') return 'ceil.l';
     throw new Error(`Undefined left bracket: ${left}`);
@@ -146,7 +146,7 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
     if (right === 'rbrack') return ']';
     if (right === 'vert' || right === 'rvert') return '|';
     if (right === 'Vert' || right === 'rVert') return 'bar.v.double';
-    if (right === 'rangle') return 'angle.r';
+    if (right === 'rangle') return 'chevron.r';
     if (right === 'rfloor') return 'floor.r';
     if (right === 'rceil') return 'ceil.r';
     throw new Error(`Undefined right bracket: ${right}`);
@@ -247,8 +247,8 @@ export const typstMacros: Record<string, string | ((state: IState, node: LatexNo
   prod: 'product',
   lfloor: 'floor.l',
   rfloor: 'floor.r',
-  langle: 'angle.l',
-  rangle: 'angle.r',
+  langle: 'chevron.l',
+  rangle: 'chevron.r',
   implies: 'arrow.r.double.long',
   notin: 'not in',
   ' ': '" "',
