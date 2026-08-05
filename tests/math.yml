@@ -185,6 +185,9 @@ cases:
   - title: text subscript in function
     tex: '\text{SR} = \sum{t_{active}}'
     typst: '"SR" = sum t_(a c t i v e)'
+  - title: textit
+    tex: '\textit{Enrichment score} = \frac{\textit{Count}}{\textit{Pool}}'
+    typst: 'italic("Enrichment score") = frac(italic("Count"), italic("Pool"))'
   - title: tilde
     tex: '\tilde{I}'
     typst: 'tilde(I)'
