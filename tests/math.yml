@@ -393,6 +393,9 @@ cases:
   - title: left right angle
     tex: '\left\langle A \right\rangle'
     typst: 'chevron.l A chevron.r'
+  - title: triangleq
+    tex: 'F_A(k) \triangleq \mathcal{F}[\tilde{A}](k)'
+    typst: 'F_A (k) eq.delta cal(F) [ tilde(A) ] (k)'
   - title: horizontal space
     tex: '\hspace{1cm}'
     typst: '#h(1cm)'
