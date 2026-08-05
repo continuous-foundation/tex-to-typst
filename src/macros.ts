@@ -77,6 +77,17 @@ for (const [typst, sym] of Object.entries(symbols)) {
   }
 }
 
+function quotedMathText(state: IState, node: LatexNode, wrapper: string) {
+  const arg = node.args?.[0] as LatexNode;
+  node.args = [];
+  state.write(`${wrapper}(`);
+  state.openFunction('text');
+  state.writeChildren(arg);
+  state.closeFunction();
+  state.write(')');
+  return '';
+}
+
 const baseMacros: Record<string, string | ((state: IState, node: LatexNode) => string)> = {
   $: '\\$',
   dfrac: 'frac',
@@ -99,6 +110,10 @@ const baseMacros: Record<string, string | ((state: IState, node: LatexNode) => s
   mathrm: 'upright',
   textrm: 'upright',
   rm: 'upright',
+  textit: (state, node) => quotedMathText(state, node, 'italic'),
+  emph: (state, node) => quotedMathText(state, node, 'italic'),
+  textbf: (state, node) => quotedMathText(state, node, 'bold'),
+  texttt: (state, node) => quotedMathText(state, node, 'mono'),
   mbox: (state, node) => {
     const arg = node.args?.[0] as LatexNode;
     node.args = [];
