@@ -1,5 +1,13 @@
 # tex-to-typst
 
+## 0.0.22
+
+### Patch Changes
+
+- [#41](https://github.com/continuous-foundation/tex-to-typst/pull/41) [`a26ae05`](https://github.com/continuous-foundation/tex-to-typst/commit/a26ae050b0e0aa84217b29064082ca3d6883dea4) Thanks [@fwkoch](https://github.com/fwkoch)! - Support quoted math text
+
+- [#41](https://github.com/continuous-foundation/tex-to-typst/pull/41) [`a26ae05`](https://github.com/continuous-foundation/tex-to-typst/commit/a26ae050b0e0aa84217b29064082ca3d6883dea4) Thanks [@fwkoch](https://github.com/fwkoch)! - Support cases
+
 ## 0.0.21
 
 ### Patch Changes
