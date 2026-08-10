@@ -185,6 +185,9 @@ cases:
   - title: text subscript in function
     tex: '\text{SR} = \sum{t_{active}}'
     typst: '"SR" = sum t_(a c t i v e)'
+  - title: textit
+    tex: '\textit{Enrichment score} = \frac{\textit{Count}}{\textit{Pool}}'
+    typst: 'italic("Enrichment score") = frac(italic("Count"), italic("Pool"))'
   - title: tilde
     tex: '\tilde{I}'
     typst: 'tilde(I)'
@@ -393,6 +396,9 @@ cases:
   - title: left right angle
     tex: '\left\langle A \right\rangle'
     typst: 'chevron.l A chevron.r'
+  - title: triangleq
+    tex: 'F_A(k) \triangleq \mathcal{F}[\tilde{A}](k)'
+    typst: 'F_A (k) eq.delta cal(F) [ tilde(A) ] (k)'
   - title: horizontal space
     tex: '\hspace{1cm}'
     typst: '#h(1cm)'
@@ -459,3 +465,9 @@ cases:
   - title: mismatched bracket delimiters around matrix use lr
     tex: '\left[ \begin{matrix} a & b \end{matrix} \right)'
     typst: 'lr([mat(delim: #none, a, b)))'
+  - title: cases environment
+    tex: 'A_0(x) = \begin{cases} A(x), & A(x) \geq c \\ 0, & \text{otherwise} \end{cases}'
+    typst: 'A_0 (x) = cases(A (x), A (x) gt.eq c, 0, "otherwise")'
+  - title: cases environment with floor
+    tex: '\text{wrap}(i; n) = \begin{cases} i, & i \leq \lfloor n/2 \rfloor \\ i - n, & \text{otherwise.} \end{cases}'
+    typst: '"wrap"(i \; n) = cases(i, i lt.eq floor.l n \/ 2 floor.r, i -n, "otherwise.")'

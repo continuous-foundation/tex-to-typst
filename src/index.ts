@@ -404,9 +404,10 @@ function convert(state: IState, node: LatexNode) {
 }
 
 function convertText(state: IState, text: string): string {
+  if (!(text in typstStrings)) return text;
   const result = typstStrings[text];
-  if (typeof result === 'function') return result(state) || text;
-  return result || text;
+  if (typeof result === 'function') return result(state);
+  return result;
 }
 
 export function writeTypst(node: LatexNode, state: IState = new State()) {

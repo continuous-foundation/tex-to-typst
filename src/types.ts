@@ -24,6 +24,7 @@ export type StateData = {
   writeOutBrackets?: boolean;
   inFunction?: boolean;
   inArray?: boolean;
+  inCases?: boolean;
   previousMatRows?: number;
   macros?: Set<string>;
 };

@@ -8,10 +8,14 @@ function isEmptyNode(node?: LatexNode): boolean {
 }
 
 export const typstStrings: Record<string, string | ((state: IState) => string)> = {
-  ',': (state) =>
-    state.data.inFunction && (state as any)._currentFunctions.slice(-1)[0] !== 'text'
+  ',': (state) => {
+    // LaTeX cases rows are often written as `i, & condition`; the comma is
+    // typographic and `&` already maps to the Typst cases argument separator.
+    if (state.data.inCases) return '';
+    return state.data.inFunction && (state as any)._currentFunctions.slice(-1)[0] !== 'text'
       ? 'comma'
-      : ',',
+      : ',';
+  },
   '&': (state) => (state.data.inArray ? ',' : '&'),
   '/': '\\/',
   ';': '\\;',
@@ -77,6 +81,17 @@ for (const [typst, sym] of Object.entries(symbols)) {
   }
 }
 
+function quotedMathText(state: IState, node: LatexNode, wrapper: string) {
+  const arg = node.args?.[0] as LatexNode;
+  node.args = [];
+  state.write(`${wrapper}(`);
+  state.openFunction('text');
+  state.writeChildren(arg);
+  state.closeFunction();
+  state.write(')');
+  return '';
+}
+
 const baseMacros: Record<string, string | ((state: IState, node: LatexNode) => string)> = {
   $: '\\$',
   dfrac: 'frac',
@@ -99,6 +114,10 @@ const baseMacros: Record<string, string | ((state: IState, node: LatexNode) => s
   mathrm: 'upright',
   textrm: 'upright',
   rm: 'upright',
+  textit: (state, node) => quotedMathText(state, node, 'italic'),
+  emph: (state, node) => quotedMathText(state, node, 'italic'),
+  textbf: (state, node) => quotedMathText(state, node, 'bold'),
+  texttt: (state, node) => quotedMathText(state, node, 'mono'),
   mbox: (state, node) => {
     const arg = node.args?.[0] as LatexNode;
     node.args = [];
@@ -176,6 +195,9 @@ const baseMacros: Record<string, string | ((state: IState, node: LatexNode) => s
   mathop: 'op',
   '\\': (state, node) => {
     node.args = [];
+    if (state.data.inCases) {
+      return ',';
+    }
     if (state.data.inArray) {
       state.data.previousMatRows = (state.data.previousMatRows ?? 0) + 1;
       if ((state as any)._value.slice(-1) === ']') state.addWhitespace();
@@ -185,6 +207,9 @@ const baseMacros: Record<string, string | ((state: IState, node: LatexNode) => s
   },
   cr: (state, node) => {
     node.args = [];
+    if (state.data.inCases) {
+      return ',';
+    }
     if (state.data.inArray) {
       state.data.previousMatRows = (state.data.previousMatRows ?? 0) + 1;
       if ((state as any)._value.slice(-1) === ']') state.addWhitespace();
@@ -348,6 +373,16 @@ const matrixEnv = (delim?: string) => (state: IState, node: LatexNode) => {
   state.data.inArray = false;
 };
 
+const casesEnv = (state: IState, node: LatexNode) => {
+  state.data.inArray = true;
+  state.data.inCases = true;
+  state.openFunction('cases');
+  state.writeChildren(node);
+  state.closeFunction();
+  state.data.inArray = false;
+  state.data.inCases = false;
+};
+
 export const typstEnvs: Record<string, (state: IState, node: LatexNode) => void> = {
   array: matrixEnv(),
   matrix: matrixEnv(),
@@ -355,6 +390,7 @@ export const typstEnvs: Record<string, (state: IState, node: LatexNode) => void>
   bmatrix: matrixEnv('['),
   Bmatrix: matrixEnv('{'),
   vmatrix: matrixEnv('|'),
+  cases: casesEnv,
   aligned(state, node) {
     state.writeChildren(node);
   },
